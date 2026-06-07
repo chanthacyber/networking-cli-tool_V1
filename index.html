@@ -2,219 +2,1553 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cisco CLI Learning App</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Cisco CLI Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background: #0f172a;
-        color: #e2e8f0;
-    }
+  :root {
+    --bg: #050a0e;
+    --bg2: #0a1520;
+    --bg3: #0e1e2d;
+    --panel: #0d1b2a;
+    --border: #1a3a5c;
+    --border2: #0e4d8a;
+    --accent: #00d4ff;
+    --accent2: #00ff88;
+    --accent3: #ff6b00;
+    --text: #c8e6f0;
+    --text2: #7ab8d4;
+    --text3: #4a7a9b;
+    --danger: #ff3860;
+    --warn: #ffdd57;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow2: 0 0 20px rgba(0,255,136,0.3);
+  }
 
-    header {
-        background: #1e293b;
-        padding: 15px;
-        text-align: center;
-        font-size: 22px;
-        font-weight: bold;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .container {
-        display: flex;
-        height: 100vh;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    .sidebar {
-        width: 300px;
-        background: #111827;
-        padding: 10px;
-        overflow-y: auto;
-        border-right: 1px solid #334155;
-    }
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .search-box {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        border: none;
-    }
+  /* Scanline effect */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .category {
-        margin-top: 15px;
-        font-size: 14px;
-        color: #94a3b8;
-    }
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,10,14,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border2);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    box-shadow: 0 2px 30px rgba(0,212,255,0.1);
+  }
 
-    .command {
-        padding: 10px;
-        margin: 5px 0;
-        background: #1f2937;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-    .command:hover {
-        background: #334155;
-    }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 12px;
+    color: var(--bg);
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
 
-    .content {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-    }
+  @keyframes pulse-logo {
+    0%, 100% { box-shadow: 0 0 10px rgba(0,212,255,0.5); }
+    50% { box-shadow: 0 0 25px rgba(0,212,255,0.9), 0 0 50px rgba(0,212,255,0.4); }
+  }
 
-    .box {
-        background: #1e293b;
-        padding: 20px;
-        border-radius: 10px;
-    }
+  .logo-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-shadow: var(--glow);
+  }
 
-    code {
-        background: #0f172a;
-        padding: 3px 6px;
-        border-radius: 5px;
-        color: #38bdf8;
-    }
+  .logo-sub {
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+  }
 
-    h2 {
-        color: #38bdf8;
-    }
+  .header-stats {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .stat-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .stat-num {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent2);
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--text3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .search-wrap {
+    padding: 0 1rem 1rem;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 1rem 0.6rem 2.4rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.7rem;
+    top: 50%;
+    transform: translateY(-65%);
+    color: var(--text3);
+    font-size: 0.9rem;
+  }
+
+  .cat-group { margin-bottom: 0.5rem; }
+
+  .cat-header {
+    padding: 0.5rem 1.2rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.55rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    font-size: 0.82rem;
+    color: var(--text2);
+  }
+
+  .nav-item:hover {
+    background: rgba(0,212,255,0.05);
+    color: var(--text);
+    border-left-color: var(--accent);
+  }
+
+  .nav-item.active {
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .nav-count {
+    margin-left: auto;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .main {
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  /* ─── HERO SECTION ─── */
+  .hero {
+    background: linear-gradient(135deg, rgba(0,212,255,0.06) 0%, rgba(0,255,136,0.04) 100%);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+  }
+
+  .hero-badge::before {
+    content: '●';
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: var(--glow);
+    margin-bottom: 0.5rem;
+  }
+
+  .hero p {
+    color: var(--text2);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+
+  /* ─── FILTER TABS ─── */
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-tab {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .filter-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+
+  /* ─── COMMAND CARDS ─── */
+  .commands-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .cmd-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+    cursor: pointer;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .cmd-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(0,212,255,0.1);
+    transform: translateX(2px);
+  }
+
+  .cmd-card.expanded {
+    border-color: var(--accent2);
+    box-shadow: var(--glow2);
+  }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+  }
+
+  .cmd-mode {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .mode-user    { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .mode-priv    { background: rgba(255,107,0,0.15); color: var(--accent3); border: 1px solid rgba(255,107,0,0.3); }
+  .mode-global  { background: rgba(0,255,136,0.15); color: var(--accent2); border: 1px solid rgba(0,255,136,0.3); }
+  .mode-iface   { background: rgba(255,221,87,0.15); color: var(--warn); border: 1px solid rgba(255,221,87,0.3); }
+  .mode-line    { background: rgba(255,56,96,0.15); color: var(--danger); border: 1px solid rgba(255,56,96,0.3); }
+  .mode-router  { background: rgba(160,100,255,0.15); color: #b080ff; border: 1px solid rgba(160,100,255,0.3); }
+  .mode-ospf    { background: rgba(255,160,0,0.15); color: #ffa020; border: 1px solid rgba(255,160,0,0.3); }
+  .mode-bgp     { background: rgba(0,180,200,0.15); color: #00c8e0; border: 1px solid rgba(0,180,200,0.3); }
+
+  .cmd-syntax {
+    flex: 1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--accent2);
+  }
+
+  .cmd-desc-short {
+    font-size: 0.8rem;
+    color: var(--text2);
+    flex: 1;
+    text-align: right;
+  }
+
+  .cmd-chevron {
+    color: var(--text3);
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .cmd-card.expanded .cmd-chevron { transform: rotate(180deg); }
+
+  /* ─── EXPANDED DETAIL ─── */
+  .cmd-detail {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+    animation: slideDown 0.2s ease;
+  }
+
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  .cmd-card.expanded .cmd-detail { display: block; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-section h4 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .detail-section h4::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .detail-section p {
+    font-size: 0.82rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* Terminal code block */
+  .terminal {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .terminal-bar {
+    background: #111;
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .t-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .t-red    { background: #ff5f57; }
+  .t-yellow { background: #febc2e; }
+  .t-green  { background: #28c840; }
+
+  .terminal-label {
+    margin-left: auto;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 1px;
+  }
+
+  .terminal-body {
+    padding: 1rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.8;
+  }
+
+  .t-prompt { color: #00ff88; }
+  .t-cmd    { color: #fff; }
+  .t-out    { color: #7ab8d4; }
+  .t-comment{ color: #4a7a9b; }
+  .t-param  { color: #ffdd57; }
+  .t-highlight { color: #ff9f43; }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { background: rgba(0,212,255,0.2); }
+
+  /* Params table */
+  .params-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.78rem;
+  }
+
+  .params-table th {
+    background: var(--bg3);
+    padding: 0.5rem 0.8rem;
+    text-align: left;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .params-table td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(26,58,92,0.5);
+    color: var(--text);
+  }
+
+  .params-table td:first-child {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--warn);
+  }
+
+  .params-table tr:last-child td { border-bottom: none; }
+
+  .params-table tr:hover td { background: rgba(0,212,255,0.03); }
+
+  /* Tags */
+  .tag-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.5rem; }
+
+  .tag {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text3);
+  }
+
+  /* ─── SECTION TITLE ─── */
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text3);
+  }
+
+  .empty-state .big-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+
+  /* ─── SCROLLBAR ─── */
+  .main::-webkit-scrollbar { width: 5px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+    .sidebar { position: relative; height: auto; top: 0; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .cmd-desc-short { display: none; }
+    .hero h1 { font-size: 1.3rem; }
+  }
+
+  /* ─── NO RESULTS ─── */
+  #no-results { display: none; }
+  .highlight { background: rgba(255,221,87,0.2); color: var(--warn); border-radius: 2px; padding: 0 2px; }
 </style>
 </head>
-
 <body>
 
-<header>Cisco CLI Learning Web App</header>
+<header>
+  <div class="logo">
+    <div class="logo-icon">IOS</div>
+    <div>
+      <div class="logo-text">CISCO CLI</div>
+      <div class="logo-sub">Reference &amp; Learning System</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-badge">
+      <span class="stat-num" id="total-count">48</span>
+      <span class="stat-label">Commands</span>
+    </div>
+    <div class="stat-badge">
+      <span class="stat-num">6</span>
+      <span class="stat-label">Categories</span>
+    </div>
+    <div class="stat-badge">
+      <span class="stat-num" id="visible-count">48</span>
+      <span class="stat-label">Shown</span>
+    </div>
+  </div>
+</header>
 
 <div class="container">
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <input type="text" class="search-box" placeholder="Search CLI command..." onkeyup="searchCommands(this.value)">
-
-        <div class="category">BASIC COMMANDS</div>
-        <div class="command" onclick="showDetail('enable')">enable</div>
-        <div class="command" onclick="showDetail('show ip')">show ip interface brief</div>
-        <div class="command" onclick="showDetail('configure')">configure terminal</div>
-
-        <div class="category">VLAN</div>
-        <div class="command" onclick="showDetail('vlan')">create VLAN</div>
-        <div class="command" onclick="showDetail('trunk')">switchport mode trunk</div>
-
-        <div class="category">ROUTING</div>
-        <div class="command" onclick="showDetail('routing')">ip routing</div>
-        <div class="command" onclick="showDetail('static')">static route</div>
-
-        <div class="category">SECURITY</div>
-        <div class="command" onclick="showDetail('password')">enable secret</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="search" placeholder="search commands..." autocomplete="off">
     </div>
 
-    <!-- Content -->
-    <div class="content">
-        <div class="box" id="output">
-            <h2>Welcome 👋</h2>
-            <p>Select a Cisco CLI command from the left menu to see details.</p>
-        </div>
+    <div class="cat-group">
+      <div class="cat-header">Categories</div>
+      <div class="nav-item active" data-cat="all" onclick="filterCat(this,'all')">
+        <span class="nav-dot" style="background:#00d4ff"></span> All Commands
+        <span class="nav-count">48</span>
+      </div>
     </div>
 
+    <div class="cat-group">
+      <div class="cat-header">Basic Modes</div>
+      <div class="nav-item" data-cat="navigation" onclick="filterCat(this,'navigation')">
+        <span class="nav-dot" style="background:#00d4ff"></span> Navigation &amp; Modes
+        <span class="nav-count">6</span>
+      </div>
+      <div class="nav-item" data-cat="show" onclick="filterCat(this,'show')">
+        <span class="nav-dot" style="background:#00ff88"></span> Show Commands
+        <span class="nav-count">10</span>
+      </div>
+    </div>
+
+    <div class="cat-group">
+      <div class="cat-header">Configuration</div>
+      <div class="nav-item" data-cat="interface" onclick="filterCat(this,'interface')">
+        <span class="nav-dot" style="background:#ffdd57"></span> Interface Config
+        <span class="nav-count">8</span>
+      </div>
+      <div class="nav-item" data-cat="routing" onclick="filterCat(this,'routing')">
+        <span class="nav-dot" style="background:#b080ff"></span> Routing
+        <span class="nav-count">10</span>
+      </div>
+      <div class="nav-item" data-cat="security" onclick="filterCat(this,'security')">
+        <span class="nav-dot" style="background:#ff3860"></span> Security
+        <span class="nav-count">8</span>
+      </div>
+      <div class="nav-item" data-cat="system" onclick="filterCat(this,'system')">
+        <span class="nav-dot" style="background:#ff6b00"></span> System &amp; Mgmt
+        <span class="nav-count">6</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="hero">
+      <div class="hero-badge">LIVE REFERENCE</div>
+      <h1>Cisco IOS CLI Reference</h1>
+      <p>Interactive command reference for Cisco IOS. Click any command to expand full details, syntax, parameters, and real-world examples. Use the search bar or category filters to navigate.</p>
+    </div>
+
+    <div class="filter-tabs" id="filter-tabs">
+      <button class="filter-tab active" onclick="filterMode(this,'all')">All Modes</button>
+      <button class="filter-tab" onclick="filterMode(this,'User EXEC')">User EXEC</button>
+      <button class="filter-tab" onclick="filterMode(this,'Privileged EXEC')">Privileged EXEC</button>
+      <button class="filter-tab" onclick="filterMode(this,'Global Config')">Global Config</button>
+      <button class="filter-tab" onclick="filterMode(this,'Interface')">Interface</button>
+      <button class="filter-tab" onclick="filterMode(this,'Routing')">Routing</button>
+    </div>
+
+    <div class="section-title" id="result-title">All Commands</div>
+
+    <div class="commands-grid" id="commands-list"></div>
+
+    <div id="no-results" class="empty-state">
+      <div class="big-icon">⚡</div>
+      <p style="font-family:'Orbitron',monospace;font-size:0.8rem;letter-spacing:2px;color:var(--text3)">NO COMMANDS FOUND</p>
+      <p style="margin-top:0.5rem;font-size:0.8rem">Try a different search term or category.</p>
+    </div>
+  </main>
 </div>
 
 <script>
-const data = {
-    "enable": {
-        title: "ENABLE MODE",
-        cmd: "enable",
-        desc: "Used to enter privileged EXEC mode in Cisco devices.",
-        example: "Router> enable",
-        note: "Allows access to configuration commands."
-    },
+// ─── DATA ───────────────────────────────────────────────────────────
+const commands = [
+  // NAVIGATION & MODES
+  {
+    cat: 'navigation', mode: 'User EXEC', modeClass: 'mode-user',
+    syntax: 'enable', shortDesc: 'Enter Privileged EXEC mode',
+    description: 'Transitions the router/switch from User EXEC mode (>) to Privileged EXEC mode (#). Requires enable password or enable secret if configured.',
+    fullSyntax: 'enable [<privilege-level>]',
+    params: [
+      { name: '[privilege-level]', desc: 'Optional 0–15 privilege level. Default is 15 (full access).' }
+    ],
+    example: `Router> enable\nPassword: ****\nRouter#`,
+    notes: 'Use "enable secret" instead of "enable password" for stronger MD5 hashing. Enable secret overrides enable password.',
+    tags: ['mode', 'access', 'privilege']
+  },
+  {
+    cat: 'navigation', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'configure terminal', shortDesc: 'Enter Global Configuration mode',
+    description: 'Enters Global Configuration mode from Privileged EXEC mode. Used to make configuration changes that affect the entire device.',
+    fullSyntax: 'configure terminal',
+    params: [],
+    example: `Router# configure terminal\nEnter configuration commands, one per line.  End with CNTL/Z.\nRouter(config)#`,
+    notes: 'Shorthand: "conf t". Exit with "end" or Ctrl+Z to return to Privileged EXEC. Use "exit" to go one level up.',
+    tags: ['mode', 'config', 'global']
+  },
+  {
+    cat: 'navigation', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'interface <type> <number>', shortDesc: 'Enter Interface Configuration mode',
+    description: 'Enters Interface Configuration mode for the specified interface. All subsequent commands apply to that specific interface.',
+    fullSyntax: 'interface <type> <slot/port>',
+    params: [
+      { name: '<type>', desc: 'Interface type: GigabitEthernet, FastEthernet, Serial, Loopback, Tunnel, Vlan' },
+      { name: '<slot/port>', desc: 'Slot and port number e.g. 0/0, 0/1. For loopback just a number.' }
+    ],
+    example: `Router(config)# interface GigabitEthernet0/0\nRouter(config-if)#\n\n! Shorthand\nRouter(config)# int g0/0`,
+    notes: 'Shorthand: "int". Use "interface range g0/0 - 3" to configure multiple interfaces simultaneously.',
+    tags: ['mode', 'interface', 'config']
+  },
+  {
+    cat: 'navigation', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'exit / end', shortDesc: 'Exit configuration mode',
+    description: '"exit" moves one level up in the mode hierarchy. "end" (or Ctrl+Z) returns directly to Privileged EXEC from any config mode.',
+    fullSyntax: 'exit  |  end  |  Ctrl+Z',
+    params: [],
+    example: `Router(config-if)# exit\nRouter(config)# exit\nRouter#\n\n! Or use "end" to jump all the way back\nRouter(config-if)# end\nRouter#`,
+    notes: '"end" is equivalent to Ctrl+Z and always returns to Privileged EXEC mode regardless of nesting depth.',
+    tags: ['mode', 'exit', 'navigation']
+  },
+  {
+    cat: 'navigation', mode: 'User EXEC', modeClass: 'mode-user',
+    syntax: 'hostname <name>', shortDesc: 'Set device hostname',
+    description: 'Sets the hostname of the Cisco device. The hostname appears in the CLI prompt and is used in dynamic protocols like CDP.',
+    fullSyntax: 'hostname <name>',
+    params: [
+      { name: '<name>', desc: 'Hostname string, up to 63 characters. No spaces; use hyphens.' }
+    ],
+    example: `Router(config)# hostname CORE-SW-01\nCORE-SW-01(config)#`,
+    notes: 'Hostname is also sent in CDP advertisements and used as SNMP sysName. Use descriptive names following your organization naming convention.',
+    tags: ['system', 'hostname', 'basic']
+  },
+  {
+    cat: 'navigation', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'reload', shortDesc: 'Reboot the device',
+    description: 'Restarts the Cisco IOS device. Will prompt if there are unsaved configuration changes. Can be scheduled with a delay.',
+    fullSyntax: 'reload [in <mm> | at <hh:mm> [<date>] | cancel]',
+    params: [
+      { name: 'in <mm>', desc: 'Reload after specified minutes (useful for safe remote changes).' },
+      { name: 'at <hh:mm>', desc: 'Schedule reload at specific time.' },
+      { name: 'cancel', desc: 'Cancel a pending scheduled reload.' }
+    ],
+    example: `! Immediate reload\nRouter# reload\n\n! Reload in 10 minutes (safety net for remote changes)\nRouter# reload in 10\nReload scheduled in 10 minutes\n\n! Cancel scheduled reload\nRouter# reload cancel`,
+    notes: 'Best practice when making remote changes: schedule "reload in 10", make changes, verify, then "reload cancel" if everything works.',
+    tags: ['system', 'reload', 'reboot']
+  },
 
-    "show ip": {
-        title: "SHOW IP INTERFACE BRIEF",
-        cmd: "show ip interface brief",
-        desc: "Displays summary of all interfaces with IP addresses and status.",
-        example: "Router# show ip interface brief",
-        note: "Very useful for checking network status quickly."
-    },
+  // SHOW COMMANDS
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show running-config', shortDesc: 'Display active configuration',
+    description: 'Displays the current running configuration stored in RAM. This is the active config being used right now. Changes made but not saved will only appear here.',
+    fullSyntax: 'show running-config [| {begin|include|exclude|section} <pattern>]',
+    params: [
+      { name: '| begin <pattern>', desc: 'Start output from first line matching pattern.' },
+      { name: '| include <pattern>', desc: 'Show only lines containing pattern.' },
+      { name: '| exclude <pattern>', desc: 'Hide lines containing pattern.' },
+      { name: '| section <pattern>', desc: 'Show config section matching pattern (e.g., section bgp).' }
+    ],
+    example: `Router# show running-config\n\n! Only show interface sections\nRouter# show running-config | section interface\n\n! Find IP addresses\nRouter# show running-config | include ip address`,
+    notes: 'Shorthand: "sh run". Pipe filtering is extremely powerful. Use "show startup-config" to see saved NVRAM config.',
+    tags: ['show', 'config', 'verification']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show ip interface brief', shortDesc: 'Interface status summary table',
+    description: 'Displays a concise table of all interfaces with their IP addresses, status (up/down), and line protocol status. Essential for quick health checks.',
+    fullSyntax: 'show ip interface brief [<interface>]',
+    params: [
+      { name: '[<interface>]', desc: 'Optional specific interface to show.' }
+    ],
+    example: `Router# show ip interface brief\nInterface       IP-Address      OK? Method Status    Protocol\nGig0/0          192.168.1.1     YES NVRAM  up        up\nGig0/1          10.0.0.1        YES NVRAM  up        up\nSerial0/0       unassigned      YES unset  down      down`,
+    notes: '"up/up" = fully operational. "up/down" = physical OK but no keepalives (Layer 2 issue). "down/down" = physical problem or shutdown.',
+    tags: ['show', 'interface', 'status', 'ip']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show ip route', shortDesc: 'Display routing table',
+    description: 'Shows the IP routing table including directly connected networks, static routes, and dynamically learned routes with their sources and metrics.',
+    fullSyntax: 'show ip route [<network> [<mask>] | connected | static | ospf | eigrp | bgp | rip]',
+    params: [
+      { name: 'connected', desc: 'Show only directly connected routes (C).' },
+      { name: 'static', desc: 'Show only static routes (S).' },
+      { name: 'ospf', desc: 'Show only OSPF-learned routes (O).' },
+      { name: '<network>', desc: 'Show route for specific network.' }
+    ],
+    example: `Router# show ip route\nCodes: C - connected, S - static, R - RIP, O - OSPF\n      B - BGP, D - EIGRP\n\nC  192.168.1.0/24 is directly connected, GigEth0/0\nS  10.0.0.0/8 [1/0] via 192.168.1.254\nO  172.16.0.0/16 [110/20] via 192.168.1.2, 00:05:23, GigEth0/0`,
+    notes: 'Route codes: C=connected, S=static, O=OSPF, B=BGP, D=EIGRP, R=RIP. [AD/metric] shows Administrative Distance and route metric.',
+    tags: ['show', 'routing', 'ip route']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show version', shortDesc: 'IOS version and hardware info',
+    description: 'Displays IOS software version, hardware model, uptime, configuration register, and memory/flash information. Essential for inventory and troubleshooting.',
+    fullSyntax: 'show version',
+    params: [],
+    example: `Router# show version\nCisco IOS Software, Version 15.2(4)M7\nRouter uptime is 2 weeks, 3 days, 14 hours\nProcessor board ID FTX1234A5BC\nCisco 2911 (revision 1.0) with 512MB/64MB memory\nConfiguration register is 0x2102`,
+    notes: 'Config register 0x2102 = normal boot. 0x2142 = ignore NVRAM (password recovery). Check last column for "bytes of non-volatile memory" (NVRAM size).',
+    tags: ['show', 'system', 'version', 'hardware']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show interfaces', shortDesc: 'Detailed interface statistics',
+    description: 'Displays detailed information about all interfaces or a specific one: counters, errors, bandwidth, MTU, hardware address, and encapsulation.',
+    fullSyntax: 'show interfaces [<interface>] [counters | description | status]',
+    params: [
+      { name: '<interface>', desc: 'Specific interface like GigabitEthernet0/0.' },
+      { name: 'counters', desc: 'Show input/output packet and error counters.' },
+      { name: 'status', desc: 'Brief status including VLAN for switches.' }
+    ],
+    example: `Router# show interfaces GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Hardware is CN Gigabit Ethernet, address is c8f9.f983.1234\n  Internet address is 192.168.1.1/24\n  MTU 1500 bytes, BW 1000000 Kbit/sec\n  5 minute input rate 1234000 bits/sec, 145 packets/sec\n  Input errors: 0, CRC: 0, Frame: 0`,
+    notes: 'Key counters: input/output errors, CRC errors (cabling issues), runts/giants (MTU mismatches), collisions (duplex mismatch).',
+    tags: ['show', 'interface', 'statistics', 'counters']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show cdp neighbors', shortDesc: 'Display Cisco Discovery Protocol neighbors',
+    description: 'Shows directly connected Cisco devices discovered via CDP. Displays device ID, local interface, holdtime, capability, platform, and port ID.',
+    fullSyntax: 'show cdp neighbors [detail]',
+    params: [
+      { name: 'detail', desc: 'Show full details including IP address, IOS version, and all capabilities.' }
+    ],
+    example: `Router# show cdp neighbors detail\nDevice ID: SW-CORE-01\nEntry address(es):\n  IP address: 10.0.0.2\nPlatform: cisco WS-C3750, Capabilities: Switch\nInterface: GigabitEthernet0/0, Port ID: GigabitEthernet1/0/1\nHoldtime: 166 sec\nVersion: Cisco IOS Software, Version 12.2(55)SE`,
+    notes: 'CDP is Cisco proprietary. Use "show lldp neighbors" for multi-vendor LLDP. Disable CDP on edge interfaces for security: "no cdp enable".',
+    tags: ['show', 'cdp', 'neighbors', 'discovery']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show processes cpu', shortDesc: 'CPU utilization per process',
+    description: 'Displays CPU utilization for 5-second, 1-minute, and 5-minute intervals, plus per-process breakdown. Useful for identifying CPU-hogging processes.',
+    fullSyntax: 'show processes cpu [sorted | history]',
+    params: [
+      { name: 'sorted', desc: 'Sort by CPU usage (highest first).' },
+      { name: 'history', desc: 'Show historical CPU chart.' }
+    ],
+    example: `Router# show processes cpu sorted\nCPU utilization for five seconds: 12%/2%; one minute: 8%; five minutes: 7%\n  PID Runtime(ms)   Invoked  uSecs    5Sec   1Min   5Min TTY Process\n  123        4523    123456     36    5.60%  3.20%  2.80%   0 IP Input\n   88        1234     23456     52    2.40%  1.80%  1.60%   0 BGP Router`,
+    notes: 'Format: "5Sec: X%/Y%" where X=total CPU, Y=interrupt CPU. High interrupt CPU suggests hardware issues. High process CPU is normal for routing protocols.',
+    tags: ['show', 'cpu', 'performance', 'troubleshoot']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show ip ospf neighbor', shortDesc: 'OSPF neighbor adjacencies',
+    description: 'Displays the OSPF neighbor table showing neighbor ID, priority, state, dead time, interface, and adjacent router details.',
+    fullSyntax: 'show ip ospf neighbor [detail]',
+    params: [
+      { name: 'detail', desc: 'Verbose output including DR/BDR election, timers, and statistics.' }
+    ],
+    example: `Router# show ip ospf neighbor\nNeighbor ID  Pri  State       Dead Time  Address      Interface\n2.2.2.2        1   FULL/DR     00:00:38   10.0.0.2     Gig0/0\n3.3.3.3        1   FULL/BDR    00:00:35   10.0.0.3     Gig0/0`,
+    notes: 'States: DOWN→INIT→2-WAY→EXSTART→EXCHANGE→LOADING→FULL. "FULL" is healthy. "2-WAY" is normal for DROther peers. "EXSTART" stuck = MTU mismatch.',
+    tags: ['show', 'ospf', 'neighbor', 'routing']
+  },
+  {
+    cat: 'show', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'show vlan brief', shortDesc: 'VLAN database summary (switches)',
+    description: 'Displays all VLANs configured on a switch, their names, status, and which ports are assigned to each VLAN. Switch-only command.',
+    fullSyntax: 'show vlan [brief | id <vlan-id> | name <name>]',
+    params: [
+      { name: 'brief', desc: 'Concise one-line per VLAN summary.' },
+      { name: 'id <vlan-id>', desc: 'Details for specific VLAN.' }
+    ],
+    example: `Switch# show vlan brief\nVLAN Name                Status    Ports\n1    default              active    Gi0/1, Gi0/2, Gi0/3\n10   MANAGEMENT           active    Gi1/1, Gi1/2\n20   SERVERS              active    Gi1/3, Gi1/4\n99   NATIVE               active`,
+    notes: 'VLANs 1-4094 are valid; 1,1002-1005 are default/reserved. VLANs 1006-4094 are extended range. Trunk ports do NOT show up in show vlan brief.',
+    tags: ['show', 'vlan', 'switch', 'layer2']
+  },
 
-    "configure": {
-        title: "CONFIGURE TERMINAL",
-        cmd: "configure terminal",
-        desc: "Enters global configuration mode.",
-        example: "Router# configure terminal",
-        note: "Used to configure device settings."
-    },
+  // INTERFACE CONFIG
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'ip address <addr> <mask>', shortDesc: 'Assign IP address to interface',
+    description: 'Assigns an IPv4 address and subnet mask to an interface. Multiple secondary addresses can be added with the "secondary" keyword.',
+    fullSyntax: 'ip address <ip-address> <subnet-mask> [secondary]',
+    params: [
+      { name: '<ip-address>', desc: 'IPv4 address in dotted decimal notation.' },
+      { name: '<subnet-mask>', desc: 'Subnet mask in dotted decimal (e.g., 255.255.255.0).' },
+      { name: '[secondary]', desc: 'Add as secondary address (multiple IPs on one interface).' }
+    ],
+    example: `Router(config-if)# ip address 192.168.1.1 255.255.255.0\n\n! Add secondary IP\nRouter(config-if)# ip address 10.0.0.1 255.0.0.0 secondary\n\n! Remove IP address\nRouter(config-if)# no ip address`,
+    notes: 'Use CIDR notation reference: /24=255.255.255.0, /25=255.255.255.128, /30=255.255.255.252. Secondary addresses are useful for subnets sharing the same physical link.',
+    tags: ['interface', 'ip', 'address', 'config']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'no shutdown', shortDesc: 'Enable (bring up) an interface',
+    description: 'Administratively enables an interface that is in the "shutdown" (administratively down) state. Interfaces are shutdown by default on some platforms.',
+    fullSyntax: 'no shutdown',
+    params: [],
+    example: `Router(config)# interface GigabitEthernet0/0\nRouter(config-if)# ip address 192.168.1.1 255.255.255.0\nRouter(config-if)# no shutdown\n%LINK-5-CHANGED: Interface GigabitEthernet0/0, changed state to up`,
+    notes: 'To administratively disable: "shutdown". Always remember "no shutdown" after configuring an interface or it stays down. New interfaces on routers default to shutdown.',
+    tags: ['interface', 'shutdown', 'enable', 'up']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'description <text>', shortDesc: 'Add interface description label',
+    description: 'Adds a human-readable description to an interface. Descriptions appear in show commands and are useful for documentation and troubleshooting.',
+    fullSyntax: 'description <text-string>',
+    params: [
+      { name: '<text-string>', desc: 'Description up to 240 characters. Spaces allowed.' }
+    ],
+    example: `Router(config-if)# description WAN-Link-to-ISP-Primary\n\n! Verify\nRouter# show interfaces GigabitEthernet0/0\nGigabitEthernet0/0 is up, line protocol is up\n  Description: WAN-Link-to-ISP-Primary`,
+    notes: 'Best practice: include circuit ID, remote end, speed, and purpose. Example: "TO:ROUTER-02:G0/1 | 1Gbps Core Link | VLAN100"',
+    tags: ['interface', 'description', 'documentation']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'duplex / speed', shortDesc: 'Set interface speed and duplex',
+    description: 'Manually sets the duplex mode (half/full) and speed of an Ethernet interface. Default is "auto" negotiation. Manual settings prevent autoneg mismatches.',
+    fullSyntax: 'duplex {auto | full | half}\nspeed {auto | 10 | 100 | 1000}',
+    params: [
+      { name: 'full', desc: 'Full-duplex: simultaneous send/receive. Required for modern networks.' },
+      { name: 'half', desc: 'Half-duplex: only one direction at a time (hub-era).' },
+      { name: '1000', desc: 'Force 1 Gbps. Must match remote end.' }
+    ],
+    example: `! Force gigabit full-duplex (for server connections)\nSwitch(config-if)# speed 1000\nSwitch(config-if)# duplex full\n\n! Best practice for uplinks: set both sides manually\nSwitch(config-if)# speed auto\nSwitch(config-if)# duplex auto`,
+    notes: 'Duplex mismatch causes severe performance degradation (late collisions, errors). If one side is hardcoded, hardcode both sides. Auto/auto is fine for most links.',
+    tags: ['interface', 'duplex', 'speed', 'ethernet']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'switchport mode trunk', shortDesc: 'Configure trunk port (switch)',
+    description: 'Configures a switch port as a 802.1Q trunk, allowing multiple VLANs to traverse the link. Used for switch-to-switch and switch-to-router connections.',
+    fullSyntax: 'switchport mode {access | trunk | dynamic {auto|desirable}}\nswitchport trunk allowed vlan {all | add | remove | except} <vlan-list>',
+    params: [
+      { name: 'trunk', desc: 'Force port into permanent trunk mode.' },
+      { name: 'access', desc: 'Force port into access mode (single VLAN).' },
+      { name: 'allowed vlan', desc: 'Specify which VLANs are permitted on trunk.' }
+    ],
+    example: `! Configure trunk port\nSwitch(config-if)# switchport mode trunk\nSwitch(config-if)# switchport trunk native vlan 99\nSwitch(config-if)# switchport trunk allowed vlan 10,20,30,99\n\n! Verify\nSwitch# show interfaces trunk`,
+    notes: 'Always set native VLAN to an unused VLAN (not 1) to prevent VLAN hopping attacks. Native VLAN must match on both ends of the trunk.',
+    tags: ['interface', 'trunk', 'vlan', 'switch', 'layer2']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'switchport access vlan <id>', shortDesc: 'Assign access port to VLAN',
+    description: 'Assigns a switch port to a specific VLAN in access mode. Access ports carry traffic for only one VLAN and connect to end devices.',
+    fullSyntax: 'switchport mode access\nswitchport access vlan <vlan-id>',
+    params: [
+      { name: '<vlan-id>', desc: 'VLAN ID 1-4094 to assign this port to.' }
+    ],
+    example: `Switch(config-if)# switchport mode access\nSwitch(config-if)# switchport access vlan 10\n\n! Verify assignment\nSwitch# show vlan brief`,
+    notes: 'Always set "switchport mode access" before assigning VLAN to prevent DTP trunking. Add "spanning-tree portfast" for end device ports.',
+    tags: ['interface', 'vlan', 'access', 'switch']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'bandwidth <kbps>', shortDesc: 'Set interface bandwidth metric',
+    description: 'Sets the bandwidth value used by routing protocols (OSPF, EIGRP) to calculate cost/metrics. Does NOT actually limit traffic throughput.',
+    fullSyntax: 'bandwidth <bandwidth-kbps>',
+    params: [
+      { name: '<bandwidth-kbps>', desc: 'Bandwidth in kilobits per second. E.g., 1000000 = 1Gbps.' }
+    ],
+    example: `! Tell OSPF/EIGRP this serial link is 512Kbps\nRouter(config-if)# bandwidth 512\n\n! OSPF cost = reference-bandwidth / interface-bandwidth\n! Default ref-BW = 100Mbps, so 10Mbps = cost 10`,
+    notes: 'Critical for OSPF: set "auto-cost reference-bandwidth 10000" (10Gbps ref) on all routers to differentiate Fast/Gig/10G links correctly.',
+    tags: ['interface', 'bandwidth', 'ospf', 'metric']
+  },
+  {
+    cat: 'interface', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'ip helper-address <ip>', shortDesc: 'DHCP relay agent',
+    description: 'Configures the interface as a DHCP relay agent. Broadcasts DHCP requests are unicast-forwarded to the specified DHCP server.',
+    fullSyntax: 'ip helper-address <server-ip>',
+    params: [
+      { name: '<server-ip>', desc: 'IP address of DHCP server to forward requests to.' }
+    ],
+    example: `! On VLAN 10 SVI or gateway interface\nRouter(config-if)# ip helper-address 192.168.100.10\n\n! Can specify multiple DHCP servers for redundancy\nRouter(config-if)# ip helper-address 192.168.100.11`,
+    notes: 'ip helper-address also forwards UDP broadcasts for TFTP (69), DNS (53), TACACS (49), NTP (37), NetBIOS (137,138), and BOOTP (67,68) by default.',
+    tags: ['interface', 'dhcp', 'helper', 'relay']
+  },
 
-    "vlan": {
-        title: "CREATE VLAN",
-        cmd: "vlan 10",
-        desc: "Creates a VLAN on a switch.",
-        example: "Switch(config)# vlan 10",
-        note: "Used for network segmentation."
-    },
+  // ROUTING
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ip route <network> <mask> <next-hop>', shortDesc: 'Configure static route',
+    description: 'Creates a static route in the routing table. The most reliable but least scalable routing method. Administrative Distance is 1 by default.',
+    fullSyntax: 'ip route <network> <mask> {<next-hop-ip> | <exit-interface>} [<AD>] [permanent]',
+    params: [
+      { name: '<network>', desc: 'Destination network address.' },
+      { name: '<mask>', desc: 'Subnet mask for the destination.' },
+      { name: '<next-hop-ip>', desc: 'IP address of next-hop router.' },
+      { name: '<exit-interface>', desc: 'Outgoing interface name.' },
+      { name: '[AD]', desc: 'Administrative Distance override (1-255). Useful for floating static routes.' },
+      { name: '[permanent]', desc: 'Keep route even when interface goes down.' }
+    ],
+    example: `! Standard static route\nRouter(config)# ip route 10.0.0.0 255.0.0.0 192.168.1.254\n\n! Default route (gateway of last resort)\nRouter(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.1\n\n! Floating static (AD=200, backup for OSPF AD=110)\nRouter(config)# ip route 10.0.0.0 255.0.0.0 192.168.2.1 200`,
+    notes: 'Always prefer specific routes over default. Use floating statics (high AD) as backup routes. The default route is the "quad zero" route: 0.0.0.0/0.',
+    tags: ['routing', 'static', 'ip route']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'router ospf <pid>', shortDesc: 'Enable OSPF routing process',
+    description: 'Creates an OSPF routing process. The Process ID is locally significant (different on each router is OK). Then configure network statements and areas.',
+    fullSyntax: 'router ospf <process-id>\n  router-id <id>\n  network <ip> <wildcard> area <area-id>',
+    params: [
+      { name: '<process-id>', desc: 'Locally significant ID 1-65535. Does not need to match neighbors.' },
+      { name: 'router-id', desc: 'Manually set stable 32-bit router ID (recommended).' },
+      { name: 'network', desc: 'Advertise networks and assign to OSPF area.' }
+    ],
+    example: `Router(config)# router ospf 1\nRouter(config-router)# router-id 1.1.1.1\nRouter(config-router)# network 192.168.1.0 0.0.0.255 area 0\nRouter(config-router)# network 10.0.0.0 0.255.255.255 area 0\nRouter(config-router)# passive-interface GigabitEthernet0/0`,
+    notes: 'Area 0 is the backbone. All other areas must connect to Area 0. Use "passive-interface" to advertise but not send OSPF hellos on stub interfaces.',
+    tags: ['routing', 'ospf', 'dynamic', 'protocol']
+  },
+  {
+    cat: 'routing', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'ip ospf <pid> area <area>', shortDesc: 'Enable OSPF on interface directly',
+    description: 'Modern way to enable OSPF directly on an interface without the network wildcard command. Cleaner and more intuitive than "network" statements.',
+    fullSyntax: 'ip ospf <process-id> area <area-id> [instance <id>]',
+    params: [
+      { name: '<process-id>', desc: 'OSPF process ID matching your router ospf configuration.' },
+      { name: '<area-id>', desc: 'OSPF area (0 = backbone, can also be written as 0.0.0.0).' }
+    ],
+    example: `Router(config)# interface GigabitEthernet0/0\nRouter(config-if)# ip ospf 1 area 0\n\nRouter(config)# interface GigabitEthernet0/1\nRouter(config-if)# ip ospf 1 area 1`,
+    notes: 'Preferred over network statements in modern IOS. Cleaner syntax and easier to read. Cannot mix network commands and per-interface OSPF on same process.',
+    tags: ['routing', 'ospf', 'interface']
+  },
+  {
+    cat: 'routing', mode: 'Routing', modeClass: 'mode-router',
+    syntax: 'router bgp <asn>', shortDesc: 'Configure BGP routing process',
+    description: 'Enables BGP on the router. BGP is used for inter-AS routing on the internet and large enterprise WAN environments. Requires explicit neighbor configuration.',
+    fullSyntax: 'router bgp <as-number>\n  bgp router-id <id>\n  neighbor <ip> remote-as <asn>\n  network <net> mask <mask>',
+    params: [
+      { name: '<as-number>', desc: 'Autonomous System Number 1-65535 (public) or 64512-65535 (private).' },
+      { name: 'neighbor remote-as', desc: 'Define BGP peer and their AS number.' },
+      { name: 'network mask', desc: 'Advertise specific network into BGP.' }
+    ],
+    example: `Router(config)# router bgp 65001\nRouter(config-router)# bgp router-id 1.1.1.1\nRouter(config-router)# neighbor 203.0.113.1 remote-as 65002\nRouter(config-router)# neighbor 203.0.113.1 description ISP-Primary\nRouter(config-router)# network 198.51.100.0 mask 255.255.255.0`,
+    notes: 'iBGP = same AS (full mesh or route reflectors required). eBGP = different AS. BGP is extremely policy-rich; attributes like LOCAL_PREF and MED control path selection.',
+    tags: ['routing', 'bgp', 'wan', 'protocol']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'router eigrp <asn>', shortDesc: 'Configure EIGRP routing process',
+    description: 'Enables EIGRP (Cisco proprietary hybrid protocol). Fast convergence, loop-free using DUAL algorithm. Named mode is the modern recommended approach.',
+    fullSyntax: 'router eigrp <as-number>\n  network <ip> [<wildcard>]\n  no auto-summary',
+    params: [
+      { name: '<as-number>', desc: 'EIGRP AS Number — must match on all neighbors.' },
+      { name: 'no auto-summary', desc: 'Disable automatic classful summarization (required for VLSM/CIDR).' }
+    ],
+    example: `! Classic mode\nRouter(config)# router eigrp 100\nRouter(config-router)# no auto-summary\nRouter(config-router)# network 10.0.0.0\nRouter(config-router)# network 192.168.1.0 0.0.0.255\n\n! Modern named mode (recommended)\nRouter(config)# router eigrp MYSITE\nRouter(config-router)# address-family ipv4 unicast autonomous-system 100`,
+    notes: 'EIGRP uses Composite Metric: bandwidth + delay (default). Load and reliability can be added but usually cause instability. AD: internal=90, external=170, summary=5.',
+    tags: ['routing', 'eigrp', 'dynamic']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ip dhcp pool <name>', shortDesc: 'Configure DHCP server pool',
+    description: 'Creates a DHCP address pool on the router/switch to serve IP addresses to clients. Requires network, default-router, and optionally dns-server.',
+    fullSyntax: 'ip dhcp pool <pool-name>\n  network <ip> <mask>\n  default-router <ip>\n  dns-server <ip>\n  lease <days>',
+    params: [
+      { name: 'network', desc: 'Network and mask for the DHCP pool scope.' },
+      { name: 'default-router', desc: 'Default gateway given to DHCP clients.' },
+      { name: 'dns-server', desc: 'DNS server address(es) up to 8 servers.' },
+      { name: 'lease', desc: 'Lease duration in days [hours [minutes]]. Default 1 day.' }
+    ],
+    example: `Router(config)# ip dhcp excluded-address 192.168.1.1 192.168.1.20\nRouter(config)# ip dhcp pool LAN_POOL\nRouter(dhcp-config)# network 192.168.1.0 255.255.255.0\nRouter(dhcp-config)# default-router 192.168.1.1\nRouter(dhcp-config)# dns-server 8.8.8.8 8.8.4.4\nRouter(dhcp-config)# lease 7\n\n! Verify\nRouter# show ip dhcp binding`,
+    notes: 'Always configure "ip dhcp excluded-address" BEFORE the pool to exclude gateway/server IPs. Use "show ip dhcp binding" to see leases, "show ip dhcp statistics" for counts.',
+    tags: ['routing', 'dhcp', 'server', 'ip']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ip nat inside source', shortDesc: 'Configure NAT / PAT',
+    description: 'Configures Network Address Translation. PAT (Port Address Translation / NAT Overload) allows multiple inside hosts to share one public IP.',
+    fullSyntax: 'ip nat inside source {static <local-ip> <global-ip> | list <acl> interface <if> overload}',
+    params: [
+      { name: 'static', desc: 'One-to-one static NAT mapping.' },
+      { name: 'list <acl>', desc: 'ACL defining inside hosts eligible for NAT.' },
+      { name: 'overload', desc: 'Enable PAT (many-to-one with port tracking).' }
+    ],
+    example: `! Configure PAT (NAT Overload)\nRouter(config)# access-list 1 permit 192.168.1.0 0.0.0.255\nRouter(config)# ip nat inside source list 1 interface GigabitEthernet0/1 overload\n\n! Mark interfaces\nRouter(config-if)# ip nat inside    ← LAN interface\nRouter(config-if)# ip nat outside   ← WAN interface\n\n! Static NAT for a server\nRouter(config)# ip nat inside source static 192.168.1.100 203.0.113.100`,
+    notes: '"ip nat inside" goes on LAN/internal interfaces. "ip nat outside" goes on WAN/internet interface. "show ip nat translations" to verify.',
+    tags: ['routing', 'nat', 'pat', 'internet']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ip access-list', shortDesc: 'Create named access control list',
+    description: 'Creates a named standard or extended ACL to permit or deny traffic based on source/destination IP, protocol, and ports.',
+    fullSyntax: 'ip access-list {standard | extended} <name>\n  [sequence] {permit | deny} <src> [<dst> <port>]',
+    params: [
+      { name: 'standard', desc: 'Filter on source IP only. Numbers 1-99, 1300-1999.' },
+      { name: 'extended', desc: 'Filter on src/dst IP, protocol, ports. Numbers 100-199, 2000-2699.' },
+      { name: 'sequence', desc: 'Line number for insertion/ordering.' }
+    ],
+    example: `! Extended named ACL\nRouter(config)# ip access-list extended BLOCK-TELNET\nRouter(config-ext-nacl)# 10 deny tcp any any eq 23 log\nRouter(config-ext-nacl)# 20 permit ip any any\n\n! Apply to interface (inbound from internet)\nRouter(config-if)# ip access-group BLOCK-TELNET in\n\n! Verify\nRouter# show ip access-lists BLOCK-TELNET`,
+    notes: 'Implicit "deny any" at the end of every ACL. Place more specific entries first. "in" filters traffic entering the interface; "out" filters traffic leaving. Extended ACLs near source, standard ACLs near destination.',
+    tags: ['routing', 'acl', 'security', 'filter']
+  },
+  {
+    cat: 'routing', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'interface loopback <n>', shortDesc: 'Create loopback interface',
+    description: 'Creates a virtual loopback interface. Always up as long as IOS is running. Used for management, OSPF router-ID, BGP peering, and testing.',
+    fullSyntax: 'interface loopback <number>',
+    params: [
+      { name: '<number>', desc: 'Loopback interface number 0-2147483647.' }
+    ],
+    example: `Router(config)# interface loopback 0\nRouter(config-if)# ip address 1.1.1.1 255.255.255.255\nRouter(config-if)# description Management-and-OSPF-RID\n\n! Use as OSPF router-ID source\nRouter(config)# router ospf 1\nRouter(config-router)# router-id 1.1.1.1`,
+    notes: 'Use /32 mask for loopbacks in routing protocols to avoid advertising unnecessary host routes. BGP peering on loopbacks requires "neighbor <ip> update-source loopback0" and eBGP multihop.',
+    tags: ['interface', 'loopback', 'management', 'ospf']
+  },
 
-    "trunk": {
-        title: "TRUNK MODE",
-        cmd: "switchport mode trunk",
-        desc: "Sets interface as trunk port to carry multiple VLANs.",
-        example: "Switch(config-if)# switchport mode trunk",
-        note: "Used between switches."
-    },
+  // SECURITY
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'enable secret <password>', shortDesc: 'Set privileged mode password (MD5)',
+    description: 'Sets an enable password using MD5 hashing (type 5). Much stronger than "enable password". Always use enable secret instead of enable password.',
+    fullSyntax: 'enable secret [0 | 5 | 8 | 9] <password>',
+    params: [
+      { name: '0', desc: 'Plaintext password (will be hashed automatically).' },
+      { name: '5', desc: 'Pre-hashed MD5 hash (type 5).' },
+      { name: '8', desc: 'PBKDF2-SHA256 hash (stronger, IOS 15.3+).' },
+      { name: '9', desc: 'scrypt hash (strongest, IOS 15.3+).' }
+    ],
+    example: `! Set plaintext (IOS hashes automatically)\nRouter(config)# enable secret MyStr0ngPass!\n\n! Verify it stored as hash\nRouter# show running-config | include enable\nenable secret 5 $1$mERr$h24OvLsM4KJmNGxWKKBLq1`,
+    notes: 'Enable secret overrides enable password if both configured. Use "service password-encryption" to also encrypt other passwords (type 7 - weak but better than plaintext).',
+    tags: ['security', 'password', 'enable', 'authentication']
+  },
+  {
+    cat: 'security', mode: 'Line', modeClass: 'mode-line',
+    syntax: 'line vty 0 4', shortDesc: 'Configure virtual terminal (SSH/Telnet)',
+    description: 'Configures virtual terminal lines used for remote access (Telnet/SSH). "line vty 0 4" allows 5 simultaneous remote sessions.',
+    fullSyntax: 'line vty <first-line> <last-line>\n  password <pw>\n  login [local]\n  transport input {ssh | telnet | all | none}',
+    params: [
+      { name: '0 4', desc: '5 simultaneous sessions (0-4). Use 0 15 for 16 sessions.' },
+      { name: 'login local', desc: 'Authenticate against local username database.' },
+      { name: 'transport input ssh', desc: 'Allow only SSH (disable telnet for security).' }
+    ],
+    example: `! Secure VTY config (SSH only with local auth)\nRouter(config)# username admin privilege 15 secret AdminPass123!\nRouter(config)# line vty 0 15\nRouter(config-line)# login local\nRouter(config-line)# transport input ssh\nRouter(config-line)# exec-timeout 10 0\nRouter(config-line)# logging synchronous`,
+    notes: 'ALWAYS use "transport input ssh" to disable telnet (plaintext). Requires: hostname set, domain name set, RSA keys generated. Add "exec-timeout 10 0" to auto-logout idle sessions.',
+    tags: ['security', 'vty', 'ssh', 'remote access']
+  },
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'crypto key generate rsa', shortDesc: 'Generate RSA keys for SSH',
+    description: 'Generates RSA key pair required for SSH server functionality. Requires hostname and domain name to be set first.',
+    fullSyntax: 'crypto key generate rsa [modulus <size>]',
+    params: [
+      { name: 'modulus <size>', desc: 'Key size in bits: 512, 1024, 2048, 4096. Use 2048 minimum.' }
+    ],
+    example: `! Prerequisites\nRouter(config)# hostname ROUTER-01\nRouter(config)# ip domain-name company.com\n\n! Generate RSA keys\nRouter(config)# crypto key generate rsa modulus 2048\nThe name for the keys will be: ROUTER-01.company.com\n% Generating 2048 bit RSA keys, keys will be non-exportable...[OK]\n\n! Enable SSH v2\nRouter(config)# ip ssh version 2`,
+    notes: 'SSH v1 has security vulnerabilities; always configure "ip ssh version 2". To delete keys: "crypto key zeroize rsa". After generating, verify with "show crypto key mypubkey rsa".',
+    tags: ['security', 'ssh', 'crypto', 'keys']
+  },
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'username <name> privilege <lvl> secret <pw>', shortDesc: 'Create local user account',
+    description: 'Creates a local user account for device authentication. Local accounts are used when RADIUS/TACACS+ is unavailable or for console/emergency access.',
+    fullSyntax: 'username <name> [privilege <0-15>] [secret <password>]',
+    params: [
+      { name: '<name>', desc: 'Username string (case-sensitive on some platforms).' },
+      { name: 'privilege <0-15>', desc: 'Privilege level. 15=full admin, 1=read-only, 0=minimal.' },
+      { name: 'secret', desc: 'Hashed password (preferred over "password").' }
+    ],
+    example: `! Full admin user\nRouter(config)# username admin privilege 15 secret AdminPass!\n\n! Read-only user (show commands only)\nRouter(config)# username readonly privilege 1 secret ViewOnly\n\n! View users\nRouter# show running-config | include username`,
+    notes: 'Use "secret" not "password" for MD5 hashing. Privilege 15 users skip the "enable" step (already at highest privilege). Consider TACACS+ for centralized auth in production.',
+    tags: ['security', 'username', 'local', 'authentication']
+  },
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ip ssh version 2', shortDesc: 'Force SSH version 2',
+    description: 'Configures the device to accept only SSH version 2 connections. SSH v2 is significantly more secure than v1 (which is vulnerable to MITM attacks).',
+    fullSyntax: 'ip ssh version 2\nip ssh time-out <seconds>\nip ssh authentication-retries <number>',
+    params: [
+      { name: 'time-out', desc: 'SSH authentication timeout in seconds (default 120).' },
+      { name: 'authentication-retries', desc: 'Max failed attempts before disconnect (default 3).' }
+    ],
+    example: `Router(config)# ip ssh version 2\nRouter(config)# ip ssh time-out 60\nRouter(config)# ip ssh authentication-retries 3\n\n! Test from outside\n$ ssh -l admin 192.168.1.1\n\n! Verify SSH config\nRouter# show ip ssh`,
+    notes: 'Requires crypto keys. "show ip ssh" shows version, auth timeout, and retries. "show ssh" shows active SSH sessions. To see active sessions: "show users".',
+    tags: ['security', 'ssh', 'version']
+  },
+  {
+    cat: 'security', mode: 'Interface', modeClass: 'mode-iface',
+    syntax: 'switchport port-security', shortDesc: 'Enable port security on switch',
+    description: 'Restricts which MAC addresses can communicate through a switch port. Protects against MAC flooding and unauthorized device connections.',
+    fullSyntax: 'switchport port-security [maximum <n>] [violation {restrict|protect|shutdown}] [mac-address {<mac>|sticky}]',
+    params: [
+      { name: 'maximum <n>', desc: 'Maximum number of MAC addresses allowed (default 1).' },
+      { name: 'violation shutdown', desc: 'Disable port on violation (err-disabled). Most secure.' },
+      { name: 'violation restrict', desc: 'Drop frames and log/increment counter on violation.' },
+      { name: 'mac-address sticky', desc: 'Learn and lock current MAC addresses dynamically.' }
+    ],
+    example: `Switch(config-if)# switchport mode access\nSwitch(config-if)# switchport port-security\nSwitch(config-if)# switchport port-security maximum 2\nSwitch(config-if)# switchport port-security violation shutdown\nSwitch(config-if)# switchport port-security mac-address sticky\n\n! Verify\nSwitch# show port-security interface Gi0/1`,
+    notes: 'To recover err-disabled port: "shutdown" then "no shutdown". Or use "errdisable recovery cause psecure-violation" for auto-recovery. Avoid sticky on uplinks.',
+    tags: ['security', 'port-security', 'switch', 'mac']
+  },
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'service password-encryption', shortDesc: 'Encrypt plaintext passwords',
+    description: 'Applies weak (Type 7) reversible encryption to all plaintext passwords in the config. Prevents casual viewing but not determined attackers (easily decoded).',
+    fullSyntax: 'service password-encryption',
+    params: [],
+    example: `Router(config)# service password-encryption\n\n! Before:\npassword cisco123\n\n! After:\npassword 7 00071A150754`,
+    notes: 'Type 7 encryption is reversible; many online decoders exist. Use "enable secret" (MD5) and "username ... secret" for real security. This is defense-in-depth, not real encryption.',
+    tags: ['security', 'password', 'encryption', 'type7']
+  },
+  {
+    cat: 'security', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'banner motd #', shortDesc: 'Configure login banner message',
+    description: 'Configures a Message of the Day banner displayed before login. Important for legal purposes — warns unauthorized users and establishes authorized use policy.',
+    fullSyntax: 'banner motd <delimiter>\n<message text>\n<delimiter>',
+    params: [
+      { name: '<delimiter>', desc: 'Any character not in message (# is common). Marks beginning and end.' }
+    ],
+    example: `Router(config)# banner motd #\nEnter TEXT message.  End with the character '#'.\n***********************************************\n* AUTHORIZED ACCESS ONLY                      *\n* Unauthorized use is prohibited and monitored*\n* Violators will be prosecuted                *\n***********************************************\n#`,
+    notes: 'Banner types: "motd" (before login), "login" (at login prompt), "exec" (after successful login). NEVER say "Welcome" in security banners — this can be used against you legally.',
+    tags: ['security', 'banner', 'motd', 'legal']
+  },
 
-    "routing": {
-        title: "IP ROUTING",
-        cmd: "ip routing",
-        desc: "Enables routing on Layer 3 switch.",
-        example: "Switch(config)# ip routing",
-        note: "Required for inter-VLAN routing."
-    },
+  // SYSTEM & MANAGEMENT
+  {
+    cat: 'system', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'copy running-config startup-config', shortDesc: 'Save configuration to NVRAM',
+    description: 'Saves the current running configuration from RAM to NVRAM (startup-config). The saved config persists through reboots. This is "saving your work".',
+    fullSyntax: 'copy running-config startup-config\n  OR\nwrite memory  (shorthand)',
+    params: [],
+    example: `Router# copy running-config startup-config\nDestination filename [startup-config]? [Enter]\nBuilding configuration...\n[OK]\n\n! Shorthand (same result)\nRouter# wr`,
+    notes: 'Shorthand "wr" or "write mem" also works. Always save after making changes. To verify: "show startup-config". To erase saved config: "write erase" or "erase startup-config".',
+    tags: ['system', 'save', 'config', 'nvram']
+  },
+  {
+    cat: 'system', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'debug ip ospf events', shortDesc: 'Enable OSPF debug logging',
+    description: 'Enables real-time OSPF event debugging. Shows neighbor state changes, DR/BDR elections, and LSA flooding. Powerful but can impact CPU.',
+    fullSyntax: 'debug ip ospf {events | adj | lsa | hello | spf | flood | packet}\nundebug all',
+    params: [
+      { name: 'events', desc: 'General OSPF events and state changes.' },
+      { name: 'adj', desc: 'Adjacency formation and teardown details.' },
+      { name: 'hello', desc: 'Hello packet send/receive (very verbose).' }
+    ],
+    example: `Router# debug ip ospf adj\nOSPF-1 ADJ Gi0/0: 2.2.2.2 address 10.0.0.2 on GigEth0/0: loading, state LOADING\nOSPF-1 ADJ Gi0/0: 2.2.2.2 address 10.0.0.2 on GigEth0/0: full, state FULL\n\n! CRITICAL: Turn off when done!\nRouter# undebug all`,
+    notes: 'WARNING: Debug on a busy router can cause CPU overload. Always have a plan to turn off: "undebug all" or "no debug all" or "u all" (shorthand). Use "debug" cautiously in production.',
+    tags: ['system', 'debug', 'ospf', 'troubleshoot']
+  },
+  {
+    cat: 'system', mode: 'Privileged EXEC', modeClass: 'mode-priv',
+    syntax: 'ping / traceroute', shortDesc: 'Network connectivity testing',
+    description: 'PING tests basic IP reachability using ICMP echo. TRACEROUTE maps the hop-by-hop path. Extended versions allow source IP and VRF specification.',
+    fullSyntax: 'ping <ip-address> [source <if/ip>] [repeat <n>] [size <bytes>]\ntraceroute <ip-address> [source <if/ip>] [ttl <min> <max>]',
+    params: [
+      { name: 'source', desc: 'Source IP or interface for the ping (useful for testing routing).' },
+      { name: 'repeat', desc: 'Number of pings to send (default 5).' },
+      { name: 'size', desc: 'Packet size in bytes (default 100). Use 1500 to test MTU.' }
+    ],
+    example: `! Basic ping\nRouter# ping 8.8.8.8\n!!!!! = 5/5 success\n\n! Extended ping from specific source\nRouter# ping 10.0.0.2 source loopback0 repeat 100\n\n! MTU test\nRouter# ping 10.0.0.2 size 1500 df-bit\n\n! Traceroute\nRouter# traceroute 8.8.8.8\n 1  192.168.1.1  4 msec\n 2  10.0.0.1     8 msec`,
+    notes: '! = success, . = timeout, U = unreachable, B = blocked by ACL. Extended ping allows testing from specific source IPs to verify correct routing. Use "traceroute" to find where packets are dropping.',
+    tags: ['system', 'ping', 'traceroute', 'troubleshoot']
+  },
+  {
+    cat: 'system', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'ntp server <ip>', shortDesc: 'Configure NTP time synchronization',
+    description: 'Configures the device to synchronize its clock with an NTP server. Accurate time is critical for logging, certificates, and protocol timers.',
+    fullSyntax: 'ntp server <ip-address> [prefer] [version <1-4>] [key <key-id>]\nntp master [stratum]\nntp authenticate',
+    params: [
+      { name: 'prefer', desc: 'Mark as preferred NTP server (used first).' },
+      { name: 'ntp master', desc: 'Make this device an NTP server (Stratum 8 default).' }
+    ],
+    example: `! Client config\nRouter(config)# ntp server 216.239.35.0 prefer\nRouter(config)# ntp server 216.239.35.4\n\n! Verify sync\nRouter# show ntp status\nClock is synchronized, stratum 3, reference is 216.239.35.0\n\nRouter# show ntp associations\n  address         ref clock    st  when  poll reach  delay offset disp\n *~216.239.35.0  .GOOG.         1    45    64  377    12.3   -0.8  1.2`,
+    notes: 'NTP Stratum: 1=atomic clock, 2=synced to stratum 1, etc. Lower = more accurate. "* " = synchronized source, "+ " = candidate. Configure NTP authentication in high-security environments.',
+    tags: ['system', 'ntp', 'time', 'management']
+  },
+  {
+    cat: 'system', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'logging host <ip>', shortDesc: 'Configure syslog server',
+    description: 'Sends system log messages to an external syslog server. Critical for centralized logging, monitoring, and compliance.',
+    fullSyntax: 'logging host <ip-address>\nlogging trap {emergencies|alerts|critical|errors|warnings|notifications|informational|debugging}\nlogging source-interface <interface>',
+    params: [
+      { name: '<ip-address>', desc: 'IP address of syslog server (UDP 514).' },
+      { name: 'trap <level>', desc: 'Set minimum severity level to send. Recommended: informational or warnings.' },
+      { name: 'source-interface', desc: 'Use specific interface IP as syslog source.' }
+    ],
+    example: `Router(config)# logging host 192.168.100.50\nRouter(config)# logging trap informational\nRouter(config)# logging source-interface loopback0\nRouter(config)# service timestamps log datetime msec localtime\n\n! Verify\nRouter# show logging`,
+    notes: 'Severity levels 0-7: 0=Emergency, 1=Alert, 2=Critical, 3=Error, 4=Warning, 5=Notice, 6=Info, 7=Debug. Lower number = higher severity. Use "service timestamps log datetime msec" for timestamps.',
+    tags: ['system', 'logging', 'syslog', 'monitoring']
+  },
+  {
+    cat: 'system', mode: 'Global Config', modeClass: 'mode-global',
+    syntax: 'snmp-server community', shortDesc: 'Configure SNMP monitoring',
+    description: 'Enables SNMP for network monitoring and management. SNMPv3 is strongly recommended for production. Community strings act as passwords.',
+    fullSyntax: 'snmp-server community <string> {RO | RW} [<acl>]\nsnmp-server host <ip> version {2c|3} <community/user>',
+    params: [
+      { name: 'RO', desc: 'Read-only access (monitoring).' },
+      { name: 'RW', desc: 'Read-write access (monitoring + config changes). Avoid if possible.' },
+      { name: '[<acl>]', desc: 'ACL to restrict which hosts can query via SNMP.' }
+    ],
+    example: `! SNMPv2c (acceptable for monitoring)\nRouter(config)# access-list 10 permit 192.168.100.0 0.0.0.255\nRouter(config)# snmp-server community MySecret01 RO 10\nRouter(config)# snmp-server host 192.168.100.50 version 2c MySecret01\nRouter(config)# snmp-server location "DC-01 Rack 3U"\nRouter(config)# snmp-server contact "noc@company.com"`,
+    notes: 'Never use default communities "public"/"private". Restrict SNMP access with ACLs. Use SNMPv3 with auth+priv for maximum security. RW community is especially dangerous.',
+    tags: ['system', 'snmp', 'monitoring', 'management']
+  }
+];
 
-    "static": {
-        title: "STATIC ROUTE",
-        cmd: "ip route",
-        desc: "Manually defines a route to a network.",
-        example: "Router(config)# ip route 192.168.2.0 255.255.255.0 192.168.1.1",
-        note: "Used when dynamic routing is not used."
-    },
+// ─── STATE ───────────────────────────────────────────────────────────
+let currentCat = 'all';
+let currentMode = 'all';
+let searchTerm = '';
 
-    "password": {
-        title: "ENABLE SECRET",
-        cmd: "enable secret",
-        desc: "Sets encrypted password for privileged mode.",
-        example: "Router(config)# enable secret mypassword",
-        note: "More secure than 'enable password'."
-    }
-};
+// ─── RENDER ──────────────────────────────────────────────────────────
+function renderCommands() {
+  const list = document.getElementById('commands-list');
+  const noResults = document.getElementById('no-results');
 
-function showDetail(key) {
-    const item = data[key];
-    if (!item) return;
+  let filtered = commands.filter(cmd => {
+    const catMatch = currentCat === 'all' || cmd.cat === currentCat;
+    const modeMatch = currentMode === 'all' || cmd.mode === currentMode;
+    const search = searchTerm.toLowerCase();
+    const searchMatch = !search ||
+      cmd.syntax.toLowerCase().includes(search) ||
+      cmd.shortDesc.toLowerCase().includes(search) ||
+      cmd.description.toLowerCase().includes(search) ||
+      cmd.tags.some(t => t.includes(search)) ||
+      cmd.mode.toLowerCase().includes(search);
+    return catMatch && modeMatch && searchMatch;
+  });
 
-    document.getElementById("output").innerHTML = `
-        <h2>${item.title}</h2>
-        <p><b>Command:</b> <code>${item.cmd}</code></p>
-        <p><b>Description:</b> ${item.desc}</p>
-        <p><b>Example:</b> <code>${item.example}</code></p>
-        <p><b>Note:</b> ${item.note}</p>
-    `;
-}
+  document.getElementById('visible-count').textContent = filtered.length;
+  document.getElementById('result-title').textContent =
+    currentCat === 'all' ? 'All Commands' :
+    currentCat === 'navigation' ? 'Navigation & Modes' :
+    currentCat === 'show' ? 'Show Commands' :
+    currentCat === 'interface' ? 'Interface Configuration' :
+    currentCat === 'routing' ? 'Routing Commands' :
+    currentCat === 'security' ? 'Security Commands' : 'System & Management';
 
-function searchCommands(value) {
-    const commands = document.querySelectorAll(".command");
-    value = value.toLowerCase();
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    noResults.style.display = 'block';
+    return;
+  }
 
-    commands.forEach(cmd => {
-        if (cmd.innerText.toLowerCase().includes(value)) {
-            cmd.style.display = "block";
-        } else {
-            cmd.style.display = "none";
+  noResults.style.display = 'none';
+
+  list.innerHTML = filtered.map((cmd, i) => {
+    const highlightedSyntax = searchTerm
+      ? cmd.syntax.replace(new RegExp(`(${escapeRegex(searchTerm)})`, 'gi'), '<span class="highlight">$1</span>')
+      : cmd.syntax;
+
+    const paramsRows = cmd.params.map(p =>
+      `<tr><td>${p.name}</td><td>${p.desc}</td></tr>`
+    ).join('');
+
+    const tagList = cmd.tags.map(t => `<span class="tag">${t}</span>`).join('');
+
+    const exampleLines = cmd.example.split('\n').map(line => {
+      if (line.startsWith('!')) return `<span class="t-comment">${line}</span>`;
+      if (line.match(/^[A-Za-z].*[>#\$]/)) {
+        const promptMatch = line.match(/^(.*[>#\$] ?)(.*)/);
+        if (promptMatch) {
+          return `<span class="t-prompt">${promptMatch[1]}</span><span class="t-cmd">${promptMatch[2]}</span>`;
         }
-    });
-}
-</script>
+      }
+      return `<span class="t-out">${line}</span>`;
+    }).join('\n');
 
+    return `
+    <div class="cmd-card" id="card-${i}" onclick="toggleCard(${i})">
+      <div class="cmd-header">
+        <span class="cmd-mode ${cmd.modeClass}">${cmd.mode}</span>
+        <span class="cmd-syntax">${highlightedSyntax}</span>
+        <span class="cmd-desc-short">${cmd.shortDesc}</span>
+        <span class="cmd-chevron">▼</span>
+      </div>
+      <div class="cmd-detail">
+        <div class="detail-grid">
+          <div class="detail-section">
+            <h4>Description</h4>
+            <p>${cmd.description}</p>
+          </div>
+          <div class="detail-section">
+            <h4>Notes & Best Practices</h4>
+            <p>${cmd.notes}</p>
+          </div>
+        </div>
+
+        <div class="detail-section" style="margin-bottom:1rem">
+          <h4>Full Syntax</h4>
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="t-dot t-red"></div>
+              <div class="t-dot t-yellow"></div>
+              <div class="t-dot t-green"></div>
+              <span class="terminal-label">SYNTAX</span>
+            </div>
+            <div class="terminal-body"><span class="t-highlight">${cmd.fullSyntax.replace(/\n/g, '</span>\n<span class="t-highlight">')}</span></div>
+          </div>
+        </div>
+
+        ${paramsRows ? `
+        <div class="detail-section" style="margin-bottom:1rem">
+          <h4>Parameters</h4>
+          <table class="params-table">
+            <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+            <tbody>${paramsRows}</tbody>
+          </table>
+        </div>` : ''}
+
+        <div class="detail-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.3rem">
+            <h4 style="margin:0">Example</h4>
+            <button class="copy-btn" onclick="copyExample(event, ${i})">⎘ Copy</button>
+          </div>
+          <div class="terminal">
+            <div class="terminal-bar">
+              <div class="t-dot t-red"></div>
+              <div class="t-dot t-yellow"></div>
+              <div class="t-dot t-green"></div>
+              <span class="terminal-label">CISCO IOS</span>
+            </div>
+            <div class="terminal-body">${exampleLines}</div>
+          </div>
+        </div>
+
+        <div class="tag-list">${tagList}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ─── INTERACTIONS ────────────────────────────────────────────────────
+function toggleCard(i) {
+  const card = document.getElementById(`card-${i}`);
+  card.classList.toggle('expanded');
+}
+
+function copyExample(e, i) {
+  e.stopPropagation();
+  const filtered = commands.filter(cmd => {
+    const catMatch = currentCat === 'all' || cmd.cat === currentCat;
+    const modeMatch = currentMode === 'all' || cmd.mode === currentMode;
+    const s = searchTerm.toLowerCase();
+    const searchMatch = !s ||
+      cmd.syntax.toLowerCase().includes(s) ||
+      cmd.shortDesc.toLowerCase().includes(s) ||
+      cmd.tags.some(t => t.includes(s));
+    return catMatch && modeMatch && searchMatch;
+  });
+  navigator.clipboard.writeText(filtered[i].example);
+  const btn = e.target;
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = '⎘ Copy', 1500);
+}
+
+function filterCat(el, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  renderCommands();
+}
+
+function filterMode(el, mode) {
+  currentMode = mode;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCommands();
+}
+
+// Search
+document.getElementById('search').addEventListener('input', function() {
+  searchTerm = this.value;
+  renderCommands();
+});
+
+// Init
+renderCommands();
+</script>
 </body>
 </html>
