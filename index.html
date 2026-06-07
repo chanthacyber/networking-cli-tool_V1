@@ -1,113 +1,450 @@
-<div class="bg-slate-950 border border-slate-800 rounded-xl p-6 max-w-[1600px] mx-auto my-6 w-full">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-6">
-        <div>
-            <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                <i data-lucide="book-open" class="w-5 h-5 text-blue-400"></i> Multi-Vendor CLI Command Matrix
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Cross-platform command reference mapping and functional breakdowns.</p>
-        </div>
-        <div class="flex flex-wrap gap-2" id="vendorTabs">
-            <button onclick="switchVendorTab('cisco')" id="tab-cisco" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition-all cursor-pointer">Cisco IOS</button>
-            <button onclick="switchVendorTab('juniper')" id="tab-juniper" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer">Juniper JunOS</button>
-            <button onclick="switchVendorTab('arista')" id="tab-arista" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer">Arista EOS</button>
-            <button onclick="switchVendorTab('fortinet')" id="tab-fortinet" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer">Fortinet FortiOS</button>
-            <button onclick="switchVendorTab('paloalto')" id="tab-paloalto" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer">Palo Alto</button>
-            <button onclick="switchVendorTab('hp')" id="tab-hp" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer">HP Comware</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cisco CLI Reference & Learning Hub</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent: #0ea5e9;
+            --accent-hover: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --terminal-bg: #020617;
+            --terminal-text: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--bg-tertiary);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 6px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        .category-list {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .category-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin: 15px 0 5px 0;
+        }
+
+        .command-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .command-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--accent-hover);
+        }
+
+        .command-item.active {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            font-weight: bold;
+        }
+
+        /* Main Content Styling */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .welcome-screen h1 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 25px;
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        .cmd-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-tertiary);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .cmd-mode-badge {
+            background-color: var(--bg-tertiary);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .syntax-box {
+            background-color: var(--terminal-bg);
+            color: #a7f3d0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        /* Interactive Terminal Sandbox */
+        .terminal-container {
+            background-color: var(--terminal-bg);
+            border-radius: 8px;
+            border: 1px solid var(--bg-tertiary);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background-color: var(--bg-tertiary);
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--terminal-text);
+            min-height: 150px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            color: #38bdf8;
+            margin-right: 5px;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #f8fafc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            flex-grow: 1;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2><span>🖥️</span> Cisco CLI Hub</h2>
+        <input type="text" class="search-box" id="searchBar" placeholder="Search commands..." oninput="filterCommands()">
+        <div class="category-list" id="categoryList"></div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="welcome-screen">
+            <h1>Welcome to the Cisco CLI Learning Hub</h1>
+            <p>Select a command from the sidebar to inspect its mode, syntax, usage details, and test it in the sandbox.</p>
         </div>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-slate-300">
-            <thead class="bg-slate-900/80 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
-                <tr>
-                    <th class="p-4 w-1/4">Category</th>
-                    <th class="p-4 w-1/3">Command Line Syntax</th>
-                    <th class="p-4 w-5/12">Functional Explanation</th>
-                </tr>
-            </thead>
-            <tbody id="vendorTableContent" class="divide-y divide-slate-900">
-                </tbody>
-        </table>
-    </div>
-</div>
+    <script>
+        // Comprehensive Cisco CLI Dataset
+        const ciscoCommands = [
+            {
+                id: "enable",
+                category: "Basic Navigation",
+                command: "enable",
+                mode: "User EXEC Mode (Router>)",
+                syntax: "enable",
+                description: "Moves the user from User EXEC mode to Privileged EXEC mode, unlocking elevated monitoring and diagnostic configurations.",
+                explanation: "This is usually the very first command entered upon logging into a Cisco device to start configuration verification."
+            },
+            {
+                id: "configure-terminal",
+                category: "Basic Navigation",
+                command: "configure terminal",
+                mode: "Privileged EXEC Mode (Router#)",
+                syntax: "configure terminal",
+                description: "Enters Global Configuration Mode. Changes made here affect the behavior of the device as a whole.",
+                explanation: "Shortens frequently to 'conf t'. Once executed, your prompt shifts to 'Router(config)#'."
+            },
+            {
+                id: "interface",
+                category: "Interface Configuration",
+                command: "interface [type/number]",
+                mode: "Global Configuration Mode (Router(config)#)",
+                syntax: "interface gigabitethernet 0/0",
+                description: "Enters Interface Configuration Mode for the target physical or logical interface.",
+                explanation: "Allows you to configure properties specific to a port, such as IP addresses, speed, or duplex values."
+            },
+            {
+                id: "ip-address",
+                category: "Interface Configuration",
+                command: "ip address [address] [mask]",
+                mode: "Interface Configuration Mode (Router(config-if)#)",
+                syntax: "ip address 192.168.1.1 255.255.255.0",
+                description: "Assigns an IPv4 address and subnet mask to the current interface container.",
+                explanation: "Requires a subsequent 'no shutdown' command to physically kick the interface awake."
+            },
+            {
+                id: "no-shutdown",
+                category: "Interface Configuration",
+                command: "no shutdown",
+                mode: "Interface Configuration Mode (Router(config-if)#)",
+                syntax: "no shutdown",
+                description: "Enables (turns on) the current interface. By default, all interfaces on a Cisco router are administratively down.",
+                explanation: "Use 'shutdown' to turn it back off manually."
+            },
+            {
+                id: "show-ip-interface-brief",
+                category: "Verification & Troubleshooting",
+                command: "show ip interface brief",
+                mode: "Privileged EXEC Mode (Router#)",
+                syntax: "show ip interface brief",
+                description: "Provides a clean, summarized output status of all interfaces, including assigned IP addresses and physical/protocol states.",
+                explanation: "One of the most vital diagnostic commands used by network engineers to verify operational state instantly."
+            },
+            {
+                id: "show-running-config",
+                category: "Verification & Troubleshooting",
+                command: "show running-config",
+                mode: "Privileged EXEC Mode (Router#)",
+                syntax: "show running-config",
+                description: "Displays the active configuration running in volatile RAM memory.",
+                explanation: "Modifications hit this configuration file instantly. Will be lost on reboot unless saved to NVRAM via copy running-config startup-config."
+            },
+            {
+                id: "copy-run-start",
+                category: "Management & Security",
+                command: "copy running-config startup-config",
+                mode: "Privileged EXEC Mode (Router#)",
+                syntax: "copy running-config startup-config",
+                description: "Saves the active volatile configuration into NVRAM so that configurations persist across a system reboot.",
+                explanation: "Can also be short-cutted to 'write memory' or 'wr' on older/most production systems."
+            }
+        ];
 
-<script>
-    const vendorData = {
-        cisco: [
-            { cat: "Interface Status", cmd: "show ip interface brief", desc: "Provides a high-level summary of all layer-3 interfaces, their assigned IP addresses, operational status (Line Protocol), and physical link layer hardware states." },
-            { cat: "System Telemetry", cmd: "show version", desc: "Displays hardware specs, device uptime, current IOS image file path string, system configuration register values, and motherboard boot diagnostics." },
-            { cat: "Routing & Pathing", cmd: "show ip route", desc: "Outputs the complete local IP routing table database showing active static entries, dynamically learned paths (OSPF, BGP, EIGRP), administrative distance, and metric weights." },
-            { cat: "VLAN Topology", cmd: "show vlan brief", desc: "Enumerates all configured virtual LAN software interfaces, their binding tracking IDs, port membership assignments, and structural administrative operational status." },
-            { cat: "State Commitment", cmd: "copy running-config startup-config", desc: "Copies current transient running operational configuration space from RAM non-volatile memory directly to NVRAM to protect parameters during hard reboots." }
-        ],
-        juniper: [
-            { cat: "Interface Status", cmd: "show interfaces terse", desc: "Presents a highly compacted system layout view of physical endpoints, logical interface tags, protocol families (inet, inet6, mpls), operational status, and addressing schema." },
-            { cat: "System Telemetry", cmd: "show version", desc: "Displays the active software model kernel package distributions, JUNOS application bundle releases, and system component module architectures." },
-            { cat: "Routing & Pathing", cmd: "show route", desc: "Interrogates the master Juniper routing engine database engine tables (inet.0, inet6.0) to present global paths alongside preference metrics." },
-            { cat: "VLAN Topology", cmd: "show vlans", desc: "Lists configured switching domains, structural tagged/untagged port matrices, 802.1Q parameters, and active bridging instances." },
-            { cat: "State Commitment", cmd: "commit", desc: "Validates, compiles, and shifts candidate pipeline parameters directly over to active execution memory context via automated transaction-level processing." }
-        ],
-        arista: [
-            { cat: "Interface Status", cmd: "show ip interface brief", desc: "Standardized modern text dashboard summary displaying physical port state markers, line status, and local IP addresses assigned across routing interfaces." },
-            { cat: "System Telemetry", cmd: "show version", desc: "Displays hardware profile details, operational EOS distribution build hashes, system flash size profiles, and module extension details." },
-            { cat: "Routing & Pathing", cmd: "show ip route", desc: "Dumps the internal hardware forwarding engine table parameters, listing adjacent gateways, dynamic protocol origins, and metric weights." },
-            { cat: "VLAN Topology", cmd: "show vlan", desc: "Generates bridging domain tables mapping virtual network containers against active physical edge and trunk configurations." },
-            { cat: "State Commitment", cmd: "copy running-config startup-config", desc: "Synchronizes the current operational execution configuration parameters onto stable internal system boot storage modules." }
-        ],
-        fortinet: [
-            { cat: "Interface Status", cmd: "get system interface physical", desc: "Presents a hardware-level view of security gateway network interfaces, link speeds, duplex modes, and received/transmitted packet performance metrics." },
-            { cat: "System Telemetry", cmd: "get system status", desc: "Displays security application engine status, current FortiOS version numbers, cluster HA profile info, and software registration license status." },
-            { cat: "Routing & Pathing", cmd: "get router info routing-table all", desc: "Pulls complete system operational kernel table metrics to show active routing entries, next-hop interfaces, and policy metrics." },
-            { cat: "VLAN Topology", cmd: "show system interface", desc: "Outputs configuration profiles for all network elements, including virtual sub-interfaces and VLAN tags mapped to physical security zones." },
-            { cat: "State Commitment", cmd: "N/A (Auto-saved)", desc: "FortiOS applies configuration adjustments to non-volatile flash storage directly in real time. No manual state execution commit step is required." }
-        ],
-        paloalto: [
-            { cat: "Interface Status", cmd: "show interface all", desc: "Exposes interface hardware speeds, operational statuses, link conditions, and assigned Layer 2/3 security zone interface definitions." },
-            { cat: "System Telemetry", cmd: "show system info", desc: "Displays hardware build signatures, PAN-OS release versions, serial numbers, management plane IP parameters, and CPU usage metrics." },
-            { cat: "Routing & Pathing", cmd: "show routing route", desc: "Exposes virtual router (VR) operational tables, tracking active next-hops, route paths, static bindings, and dynamic peer configurations." },
-            { cat: "VLAN Topology", cmd: "show interface vlan only", desc: "Filters layout profiles to output logical internal VLAN interface tags and security policy mappings across switching instances." },
-            { cat: "State Commitment", cmd: "configure\ncommit", desc: "Enters structural configuration mode and executes a policy compilation transaction to move changes from candidate state to live execution context." }
-        ],
-        hp: [
-            { cat: "Interface Status", cmd: "display ip interface brief", desc: "Provides Comware platform layout listing interface protocol states, physical port statuses, link layers, and logical network addresses." },
-            { cat: "System Telemetry", cmd: "display version", desc: "Outputs Comware OS platform kernel information, software patch sets, hardware model numbers, and system boot times." },
-            { cat: "Routing & Pathing", cmd: "display ip routing-table", desc: "Queries global Layer-3 pathing matrix configurations to expose destination metrics, interface parameters, and structural route preferences." },
-            { cat: "VLAN Topology", cmd: "display vlan", desc: "Provides switching domain visibility, showing VLAN descriptions, interface status markers, and operational port allocations." },
-            { cat: "State Commitment", cmd: "save force", desc: "Bypasses contextual interactive user prompts to directly write the transient configuration state into structural system startup files." }
-        ]
-    };
+        // Group commands by category and render sidebar
+        function initApp() {
+            const categoryListContainer = document.getElementById('categoryList');
+            const categories = [...new Set(ciscoCommands.map(cmd => cmd.category))];
+            
+            categoryListContainer.innerHTML = '';
 
-    function switchVendorTab(vendorKey) {
-        // Reset tab styling
-        const tabs = document.querySelectorAll('#vendorTabs button');
-        tabs.forEach(tab => {
-            tab.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all cursor-pointer";
-        });
+            categories.forEach(category => {
+                const title = document.createElement('div');
+                title.className = 'category-title';
+                title.innerText = category;
+                categoryListContainer.appendChild(title);
 
-        // Highlight selected tab
-        document.getElementById(`tab-${vendorKey}`).className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition-all cursor-pointer";
+                const filtered = ciscoCommands.filter(cmd => cmd.category === category);
+                filtered.forEach(cmd => {
+                    const item = document.createElement('div');
+                    item.className = 'command-item';
+                    item.innerText = cmd.command;
+                    item.setAttribute('data-id', cmd.id);
+                    item.onclick = () => selectCommand(cmd.id);
+                    categoryListContainer.appendChild(item);
+                });
+            });
+        }
 
-        // Inject Table Content
-        const tbody = document.getElementById('vendorTableContent');
-        tbody.innerHTML = '';
+        // Handle selection filtering
+        function filterCommands() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const items = document.querySelectorAll('.command-item');
+            
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if(text.includes(query)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
 
-        vendorData[vendorKey].forEach(item => {
-            const row = document.createElement('tr');
-            row.className = "hover:bg-slate-900/30 transition-colors";
-            row.innerHTML = `
-                <td class="p-4 font-semibold text-slate-400 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
-                    ${item.cat}
-                </td>
-                <td class="p-4 font-mono text-indigo-400 font-bold whitespace-pre-wrap">${item.cmd}</td>
-                <td class="p-4 text-slate-300 leading-relaxed">${item.desc}</td>
+        // Load targeted data views
+        function selectCommand(id) {
+            // Manage Active States
+            document.querySelectorAll('.command-item').forEach(el => el.classList.remove('active'));
+            const activeEl = document.querySelector(`[data-id="${id}"]`);
+            if (activeEl) activeEl.classList.add('active');
+
+            const data = ciscoCommands.find(cmd => cmd.id === id);
+            const mainContent = document.getElementById('mainContent');
+
+            // Set dynamic inner prompt structure
+            let promptSymbol = "Router#";
+            if (data.mode.includes("User")) promptSymbol = "Router>";
+            if (data.mode.includes("config)#")) promptSymbol = "Router(config)#";
+            if (data.mode.includes("if)#")) promptSymbol = "Router(config-if)#";
+
+            mainContent.innerHTML = `
+                <div class="card">
+                    <div class="cmd-header">
+                        <h2>${data.command}</h2>
+                        <span class="cmd-mode-badge">${data.mode}</span>
+                    </div>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">${data.description}</p>
+                    
+                    <h3 style="font-size: 1rem; margin-bottom: 5px; color: var(--accent);">Example Syntax</h3>
+                    <div class="syntax-box">${data.syntax}</div>
+                    
+                    <h3 style="font-size: 1rem; margin-top: 15px; margin-bottom: 5px; color: var(--accent);">Deep-Dive Note</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.5; color: #cbd5e1;">${data.explanation}</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 10px; font-size: 1.1rem;">⚡ Interactive Sandbox Tracker</h3>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                        Try typing the exact syntax command below (<strong style="color:var(--text-main);">${data.syntax}</strong>) to see how the terminal behavior changes!
+                    </p>
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <span>IOS Terminal Simulation Emulator</span>
+                            <span>v15.2</span>
+                        </div>
+                        <div class="terminal-body" onclick="focusTerminalInput()">
+                            <div class="terminal-output" id="terminalOutput">Type the command to see the emulator evaluate structural changes...</div>
+                            <div class="terminal-input-line">
+                                <span class="terminal-prompt" id="terminalPrompt">${promptSymbol}</span>
+                                <input type="text" class="terminal-input" id="terminalInput" autofocus autocomplete="off" spellcheck="false" onkeydown="handleTerminalSubmit(event, '${data.syntax}', '${data.command}')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             `;
-            tbody.appendChild(row);
-        });
-    }
+        }
 
-    // Initialize with Cisco data on component mount
-    window.addEventListener('DOMContentLoaded', () => {
-        switchVendorTab('cisco');
-    });
-</script>
+        function focusTerminalInput() {
+            const input = document.getElementById('terminalInput');
+            if (input) input.focus();
+        }
+
+        // Basic validation mechanics inside terminal mock container
+        function handleTerminalSubmit(event, expectedSyntax, rawCommand) {
+            if (event.key === 'Enter') {
+                const inputElement = document.getElementById('terminalInput');
+                const outputElement = document.getElementById('terminalOutput');
+                const promptElement = document.getElementById('terminalPrompt');
+                const userInput = inputElement.value.trim();
+
+                if (!userInput) return;
+
+                // Create history trace log entries
+                let baselineResponse = `\n${promptElement.innerText} ${userInput}`;
+
+                if (userInput === expectedSyntax || userInput === rawCommand) {
+                    baselineResponse += `\n\n[SUCCESS] Command executed correctly.\n`;
+                    // Simple logic tracking state shifts dynamically
+                    if (rawCommand === "enable") {
+                        promptElement.innerText = "Router#";
+                        baselineResponse += "Switched into Privileged Execution operational view context.\n";
+                    } else if (rawCommand === "configure terminal") {
+                        promptElement.innerText = "Router(config)#";
+                    } else if (rawCommand.startsWith("interface")) {
+                        promptElement.innerText = "Router(config-if)#";
+                    }
+                } else {
+                    baselineResponse += `\n\n% Invalid input detected at marker position.\nExpected: "${expectedSyntax}"`;
+                }
+
+                outputElement.innerText = baselineResponse;
+                inputElement.value = '';
+                
+                // Keep terminal view scrolling down dynamically
+                const terminalBody = document.querySelector('.terminal-body');
+                terminalBody.scrollTop = terminalBody.scrollHeight;
+            }
+        }
+
+        // Run application sequence
+        initApp();
+    </script>
+</body>
+</html>
