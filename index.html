@@ -1,450 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cisco CLI Reference & Learning Hub</title>
-    <style>
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --accent: #0ea5e9;
-            --accent-hover: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --terminal-bg: #020617;
-            --terminal-text: #38bdf8;
-        }
+<meta charset="UTF-8">
+<title>Cisco CLI Learning App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: #e2e8f0;
+    }
 
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    header {
+        background: #1e293b;
+        padding: 15px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+    }
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: 320px;
-            background-color: var(--bg-secondary);
-            border-right: 1px solid var(--bg-tertiary);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
+    .container {
+        display: flex;
+        height: 100vh;
+    }
 
-        .sidebar h2 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .sidebar {
+        width: 300px;
+        background: #111827;
+        padding: 10px;
+        overflow-y: auto;
+        border-right: 1px solid #334155;
+    }
 
-        .search-box {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--bg-tertiary);
-            border-radius: 6px;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            outline: none;
-        }
+    .search-box {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: none;
+    }
 
-        .search-box:focus {
-            border-color: var(--accent);
-        }
+    .category {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #94a3b8;
+    }
 
-        .category-list {
-            overflow-y: auto;
-            flex-grow: 1;
-        }
+    .command {
+        padding: 10px;
+        margin: 5px 0;
+        background: #1f2937;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
-        .category-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin: 15px 0 5px 0;
-        }
+    .command:hover {
+        background: #334155;
+    }
 
-        .command-item {
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+    }
 
-        .command-item:hover {
-            background-color: var(--bg-tertiary);
-            color: var(--accent-hover);
-        }
+    .box {
+        background: #1e293b;
+        padding: 20px;
+        border-radius: 10px;
+    }
 
-        .command-item.active {
-            background-color: var(--accent);
-            color: var(--bg-primary);
-            font-weight: bold;
-        }
+    code {
+        background: #0f172a;
+        padding: 3px 6px;
+        border-radius: 5px;
+        color: #38bdf8;
+    }
 
-        /* Main Content Styling */
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .welcome-screen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .welcome-screen h1 {
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        .card {
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 25px;
-            border: 1px solid var(--bg-tertiary);
-        }
-
-        .cmd-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--bg-tertiary);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-
-        .cmd-mode-badge {
-            background-color: var(--bg-tertiary);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .syntax-box {
-            background-color: var(--terminal-bg);
-            color: #a7f3d0;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            border-left: 4px solid #10b981;
-        }
-
-        /* Interactive Terminal Sandbox */
-        .terminal-container {
-            background-color: var(--terminal-bg);
-            border-radius: 8px;
-            border: 1px solid var(--bg-tertiary);
-            overflow: hidden;
-        }
-
-        .terminal-header {
-            background-color: var(--bg-tertiary);
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .terminal-body {
-            padding: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            color: var(--terminal-text);
-            min-height: 150px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .terminal-output {
-            white-space: pre-wrap;
-            margin-bottom: 10px;
-            color: #e2e8f0;
-        }
-
-        .terminal-input-line {
-            display: flex;
-            align-items: center;
-        }
-
-        .terminal-prompt {
-            color: #38bdf8;
-            margin-right: 5px;
-        }
-
-        .terminal-input {
-            background: transparent;
-            border: none;
-            color: #f8fafc;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1rem;
-            flex-grow: 1;
-            outline: none;
-        }
-    </style>
+    h2 {
+        color: #38bdf8;
+    }
+</style>
 </head>
+
 <body>
 
+<header>Cisco CLI Learning Web App</header>
+
+<div class="container">
+
+    <!-- Sidebar -->
     <div class="sidebar">
-        <h2><span>🖥️</span> Cisco CLI Hub</h2>
-        <input type="text" class="search-box" id="searchBar" placeholder="Search commands..." oninput="filterCommands()">
-        <div class="category-list" id="categoryList"></div>
+        <input type="text" class="search-box" placeholder="Search CLI command..." onkeyup="searchCommands(this.value)">
+
+        <div class="category">BASIC COMMANDS</div>
+        <div class="command" onclick="showDetail('enable')">enable</div>
+        <div class="command" onclick="showDetail('show ip')">show ip interface brief</div>
+        <div class="command" onclick="showDetail('configure')">configure terminal</div>
+
+        <div class="category">VLAN</div>
+        <div class="command" onclick="showDetail('vlan')">create VLAN</div>
+        <div class="command" onclick="showDetail('trunk')">switchport mode trunk</div>
+
+        <div class="category">ROUTING</div>
+        <div class="command" onclick="showDetail('routing')">ip routing</div>
+        <div class="command" onclick="showDetail('static')">static route</div>
+
+        <div class="category">SECURITY</div>
+        <div class="command" onclick="showDetail('password')">enable secret</div>
     </div>
 
-    <div class="main-content" id="mainContent">
-        <div class="welcome-screen">
-            <h1>Welcome to the Cisco CLI Learning Hub</h1>
-            <p>Select a command from the sidebar to inspect its mode, syntax, usage details, and test it in the sandbox.</p>
+    <!-- Content -->
+    <div class="content">
+        <div class="box" id="output">
+            <h2>Welcome 👋</h2>
+            <p>Select a Cisco CLI command from the left menu to see details.</p>
         </div>
     </div>
 
-    <script>
-        // Comprehensive Cisco CLI Dataset
-        const ciscoCommands = [
-            {
-                id: "enable",
-                category: "Basic Navigation",
-                command: "enable",
-                mode: "User EXEC Mode (Router>)",
-                syntax: "enable",
-                description: "Moves the user from User EXEC mode to Privileged EXEC mode, unlocking elevated monitoring and diagnostic configurations.",
-                explanation: "This is usually the very first command entered upon logging into a Cisco device to start configuration verification."
-            },
-            {
-                id: "configure-terminal",
-                category: "Basic Navigation",
-                command: "configure terminal",
-                mode: "Privileged EXEC Mode (Router#)",
-                syntax: "configure terminal",
-                description: "Enters Global Configuration Mode. Changes made here affect the behavior of the device as a whole.",
-                explanation: "Shortens frequently to 'conf t'. Once executed, your prompt shifts to 'Router(config)#'."
-            },
-            {
-                id: "interface",
-                category: "Interface Configuration",
-                command: "interface [type/number]",
-                mode: "Global Configuration Mode (Router(config)#)",
-                syntax: "interface gigabitethernet 0/0",
-                description: "Enters Interface Configuration Mode for the target physical or logical interface.",
-                explanation: "Allows you to configure properties specific to a port, such as IP addresses, speed, or duplex values."
-            },
-            {
-                id: "ip-address",
-                category: "Interface Configuration",
-                command: "ip address [address] [mask]",
-                mode: "Interface Configuration Mode (Router(config-if)#)",
-                syntax: "ip address 192.168.1.1 255.255.255.0",
-                description: "Assigns an IPv4 address and subnet mask to the current interface container.",
-                explanation: "Requires a subsequent 'no shutdown' command to physically kick the interface awake."
-            },
-            {
-                id: "no-shutdown",
-                category: "Interface Configuration",
-                command: "no shutdown",
-                mode: "Interface Configuration Mode (Router(config-if)#)",
-                syntax: "no shutdown",
-                description: "Enables (turns on) the current interface. By default, all interfaces on a Cisco router are administratively down.",
-                explanation: "Use 'shutdown' to turn it back off manually."
-            },
-            {
-                id: "show-ip-interface-brief",
-                category: "Verification & Troubleshooting",
-                command: "show ip interface brief",
-                mode: "Privileged EXEC Mode (Router#)",
-                syntax: "show ip interface brief",
-                description: "Provides a clean, summarized output status of all interfaces, including assigned IP addresses and physical/protocol states.",
-                explanation: "One of the most vital diagnostic commands used by network engineers to verify operational state instantly."
-            },
-            {
-                id: "show-running-config",
-                category: "Verification & Troubleshooting",
-                command: "show running-config",
-                mode: "Privileged EXEC Mode (Router#)",
-                syntax: "show running-config",
-                description: "Displays the active configuration running in volatile RAM memory.",
-                explanation: "Modifications hit this configuration file instantly. Will be lost on reboot unless saved to NVRAM via copy running-config startup-config."
-            },
-            {
-                id: "copy-run-start",
-                category: "Management & Security",
-                command: "copy running-config startup-config",
-                mode: "Privileged EXEC Mode (Router#)",
-                syntax: "copy running-config startup-config",
-                description: "Saves the active volatile configuration into NVRAM so that configurations persist across a system reboot.",
-                explanation: "Can also be short-cutted to 'write memory' or 'wr' on older/most production systems."
-            }
-        ];
+</div>
 
-        // Group commands by category and render sidebar
-        function initApp() {
-            const categoryListContainer = document.getElementById('categoryList');
-            const categories = [...new Set(ciscoCommands.map(cmd => cmd.category))];
-            
-            categoryListContainer.innerHTML = '';
+<script>
+const data = {
+    "enable": {
+        title: "ENABLE MODE",
+        cmd: "enable",
+        desc: "Used to enter privileged EXEC mode in Cisco devices.",
+        example: "Router> enable",
+        note: "Allows access to configuration commands."
+    },
 
-            categories.forEach(category => {
-                const title = document.createElement('div');
-                title.className = 'category-title';
-                title.innerText = category;
-                categoryListContainer.appendChild(title);
+    "show ip": {
+        title: "SHOW IP INTERFACE BRIEF",
+        cmd: "show ip interface brief",
+        desc: "Displays summary of all interfaces with IP addresses and status.",
+        example: "Router# show ip interface brief",
+        note: "Very useful for checking network status quickly."
+    },
 
-                const filtered = ciscoCommands.filter(cmd => cmd.category === category);
-                filtered.forEach(cmd => {
-                    const item = document.createElement('div');
-                    item.className = 'command-item';
-                    item.innerText = cmd.command;
-                    item.setAttribute('data-id', cmd.id);
-                    item.onclick = () => selectCommand(cmd.id);
-                    categoryListContainer.appendChild(item);
-                });
-            });
+    "configure": {
+        title: "CONFIGURE TERMINAL",
+        cmd: "configure terminal",
+        desc: "Enters global configuration mode.",
+        example: "Router# configure terminal",
+        note: "Used to configure device settings."
+    },
+
+    "vlan": {
+        title: "CREATE VLAN",
+        cmd: "vlan 10",
+        desc: "Creates a VLAN on a switch.",
+        example: "Switch(config)# vlan 10",
+        note: "Used for network segmentation."
+    },
+
+    "trunk": {
+        title: "TRUNK MODE",
+        cmd: "switchport mode trunk",
+        desc: "Sets interface as trunk port to carry multiple VLANs.",
+        example: "Switch(config-if)# switchport mode trunk",
+        note: "Used between switches."
+    },
+
+    "routing": {
+        title: "IP ROUTING",
+        cmd: "ip routing",
+        desc: "Enables routing on Layer 3 switch.",
+        example: "Switch(config)# ip routing",
+        note: "Required for inter-VLAN routing."
+    },
+
+    "static": {
+        title: "STATIC ROUTE",
+        cmd: "ip route",
+        desc: "Manually defines a route to a network.",
+        example: "Router(config)# ip route 192.168.2.0 255.255.255.0 192.168.1.1",
+        note: "Used when dynamic routing is not used."
+    },
+
+    "password": {
+        title: "ENABLE SECRET",
+        cmd: "enable secret",
+        desc: "Sets encrypted password for privileged mode.",
+        example: "Router(config)# enable secret mypassword",
+        note: "More secure than 'enable password'."
+    }
+};
+
+function showDetail(key) {
+    const item = data[key];
+    if (!item) return;
+
+    document.getElementById("output").innerHTML = `
+        <h2>${item.title}</h2>
+        <p><b>Command:</b> <code>${item.cmd}</code></p>
+        <p><b>Description:</b> ${item.desc}</p>
+        <p><b>Example:</b> <code>${item.example}</code></p>
+        <p><b>Note:</b> ${item.note}</p>
+    `;
+}
+
+function searchCommands(value) {
+    const commands = document.querySelectorAll(".command");
+    value = value.toLowerCase();
+
+    commands.forEach(cmd => {
+        if (cmd.innerText.toLowerCase().includes(value)) {
+            cmd.style.display = "block";
+        } else {
+            cmd.style.display = "none";
         }
+    });
+}
+</script>
 
-        // Handle selection filtering
-        function filterCommands() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
-            const items = document.querySelectorAll('.command-item');
-            
-            items.forEach(item => {
-                const text = item.innerText.toLowerCase();
-                if(text.includes(query)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
-                }
-            });
-        }
-
-        // Load targeted data views
-        function selectCommand(id) {
-            // Manage Active States
-            document.querySelectorAll('.command-item').forEach(el => el.classList.remove('active'));
-            const activeEl = document.querySelector(`[data-id="${id}"]`);
-            if (activeEl) activeEl.classList.add('active');
-
-            const data = ciscoCommands.find(cmd => cmd.id === id);
-            const mainContent = document.getElementById('mainContent');
-
-            // Set dynamic inner prompt structure
-            let promptSymbol = "Router#";
-            if (data.mode.includes("User")) promptSymbol = "Router>";
-            if (data.mode.includes("config)#")) promptSymbol = "Router(config)#";
-            if (data.mode.includes("if)#")) promptSymbol = "Router(config-if)#";
-
-            mainContent.innerHTML = `
-                <div class="card">
-                    <div class="cmd-header">
-                        <h2>${data.command}</h2>
-                        <span class="cmd-mode-badge">${data.mode}</span>
-                    </div>
-                    <p style="color: var(--text-muted); margin-bottom: 15px;">${data.description}</p>
-                    
-                    <h3 style="font-size: 1rem; margin-bottom: 5px; color: var(--accent);">Example Syntax</h3>
-                    <div class="syntax-box">${data.syntax}</div>
-                    
-                    <h3 style="font-size: 1rem; margin-top: 15px; margin-bottom: 5px; color: var(--accent);">Deep-Dive Note</h3>
-                    <p style="font-size: 0.95rem; line-height: 1.5; color: #cbd5e1;">${data.explanation}</p>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 10px; font-size: 1.1rem;">⚡ Interactive Sandbox Tracker</h3>
-                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
-                        Try typing the exact syntax command below (<strong style="color:var(--text-main);">${data.syntax}</strong>) to see how the terminal behavior changes!
-                    </p>
-                    <div class="terminal-container">
-                        <div class="terminal-header">
-                            <span>IOS Terminal Simulation Emulator</span>
-                            <span>v15.2</span>
-                        </div>
-                        <div class="terminal-body" onclick="focusTerminalInput()">
-                            <div class="terminal-output" id="terminalOutput">Type the command to see the emulator evaluate structural changes...</div>
-                            <div class="terminal-input-line">
-                                <span class="terminal-prompt" id="terminalPrompt">${promptSymbol}</span>
-                                <input type="text" class="terminal-input" id="terminalInput" autofocus autocomplete="off" spellcheck="false" onkeydown="handleTerminalSubmit(event, '${data.syntax}', '${data.command}')">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function focusTerminalInput() {
-            const input = document.getElementById('terminalInput');
-            if (input) input.focus();
-        }
-
-        // Basic validation mechanics inside terminal mock container
-        function handleTerminalSubmit(event, expectedSyntax, rawCommand) {
-            if (event.key === 'Enter') {
-                const inputElement = document.getElementById('terminalInput');
-                const outputElement = document.getElementById('terminalOutput');
-                const promptElement = document.getElementById('terminalPrompt');
-                const userInput = inputElement.value.trim();
-
-                if (!userInput) return;
-
-                // Create history trace log entries
-                let baselineResponse = `\n${promptElement.innerText} ${userInput}`;
-
-                if (userInput === expectedSyntax || userInput === rawCommand) {
-                    baselineResponse += `\n\n[SUCCESS] Command executed correctly.\n`;
-                    // Simple logic tracking state shifts dynamically
-                    if (rawCommand === "enable") {
-                        promptElement.innerText = "Router#";
-                        baselineResponse += "Switched into Privileged Execution operational view context.\n";
-                    } else if (rawCommand === "configure terminal") {
-                        promptElement.innerText = "Router(config)#";
-                    } else if (rawCommand.startsWith("interface")) {
-                        promptElement.innerText = "Router(config-if)#";
-                    }
-                } else {
-                    baselineResponse += `\n\n% Invalid input detected at marker position.\nExpected: "${expectedSyntax}"`;
-                }
-
-                outputElement.innerText = baselineResponse;
-                inputElement.value = '';
-                
-                // Keep terminal view scrolling down dynamically
-                const terminalBody = document.querySelector('.terminal-body');
-                terminalBody.scrollTop = terminalBody.scrollHeight;
-            }
-        }
-
-        // Run application sequence
-        initApp();
-    </script>
 </body>
 </html>
